@@ -16,5 +16,9 @@ make test
 make install
 
 If you have suggestions, bug reports, or if you want to add a new date
-format, feel free to contact me:  morty@umbc.edu
+format, feel free to contact me:  morty@sanctuary.arbutus.md.us
+
+If you want to be on the announcement list for new releases, send a mail
+with "subscribe" as the first line of the body to:
+dateconvert-announce-request@sanctuary.arbutus.md.us
 

@@ -3,7 +3,7 @@ package Date::Convert;
 
 use Carp;
 
-$VERSION="0.14";
+$VERSION="0.16";
 
 
 $VERSION=$VERSION; # to make -w happy.  :)
@@ -17,7 +17,7 @@ $VERSION=$VERSION; # to make -w happy.  :)
 
 $BEGINNING=1721426; # 1 Jan 1 in the Gregorian calendar, although technically, 
                     # the Gregorian calendar didn't exist at the time.
-$VERSION_TODAY=2450522; # today in astro, when I wrote this.
+$VERSION_TODAY=2450522; # today in JDN, when I wrote this.
 
 
 sub new { # straight out of the perlobj manpage:
@@ -32,9 +32,9 @@ sub new { # straight out of the perlobj manpage:
 sub initialize {
     my $self = shift;
     my $val  = shift || $VERSION_TODAY;
-    carp "Date::Convert is not reliable before astro $BEGINNING" 
+    carp "Date::Convert is not reliable before Absolute $BEGINNING" 
 	if $val < $BEGINNING;
-    $$self{astro}=$val;
+    $$self{absol}=$val;
 }
 
 
@@ -43,7 +43,7 @@ sub clean {
     my $self  = shift;
     my $key;
     foreach $key (keys %$self) {
-	delete $$self{$key} unless $key eq 'astro';
+	delete $$self{$key} unless $key eq 'absol';
     }
 }
 
@@ -59,9 +59,9 @@ sub convert {
 
 
 
-sub astro {
+sub absol {
     my $self = shift;
-    return $$self{astro};
+    return $$self{absol};
 }
 
 
@@ -94,7 +94,7 @@ sub year {
     my $year;
     # note:  years and days are initially days *before* today, rather than
     # today's date.  This is because of fenceposts.  :)
-    $days =  $$self{astro} - $GREG_BEGINNING;
+    $days =  $$self{absol} - $GREG_BEGINNING;
     if (($days+1) % $FOUR_CENTURIES) { # normal case
 	$year =  int ($days / $FOUR_CENTURIES) * 400;
 	$days %= $FOUR_CENTURIES;
@@ -182,20 +182,20 @@ sub initialize {
 	croak "Date::Convert::Gregorian::initialize needs more args";
     warn "These routines don't work well for Gregorian before year 1"
 	if $year<1;
-    my $astro = $GREG_BEGINNING;
+    my $absol = $GREG_BEGINNING;
     $$self{'year'} = $year;
     $$self{'month'}= $month;
     $$self{'day'}  = $day;
     my $is_leap = is_leap Date::Convert::Gregorian $year;
     $year --;  #get years *before* this year.  Makes math easier.  :)
     # first, convert year into days. . .
-    $astro += int($year/400)*$FOUR_CENTURIES;
+    $absol += int($year/400)*$FOUR_CENTURIES;
     $year  %= 400;
-    $astro += int($year/100)*$CENTURY;
+    $absol += int($year/100)*$CENTURY;
     $year  %= 100;
-    $astro += int($year/4)*$FOUR_YEARS;
+    $absol += int($year/4)*$FOUR_YEARS;
     $year  %= 4;
-    $astro += $year*$NORMAL_YEAR;
+    $absol += $year*$NORMAL_YEAR;
     # now, month into days.
     croak "month number $month out of range" 
 	if $month < 1 || $month >12;
@@ -203,8 +203,8 @@ sub initialize {
     $MONTH_REF=\@LEAP_ENDS if $is_leap;
     croak "day number $day out of range for month $month"
 	if $day<1 || $day+$$MONTH_REF[$month-1]>$$MONTH_REF[$month];
-    $astro += $day+$$MONTH_REF[$month-1]-1;
-    $$self{astro}=$astro;
+    $absol += $day+$$MONTH_REF[$month-1]-1;
+    $$self{absol}=$absol;
 }
 
 
@@ -243,7 +243,8 @@ $HEBREW_BEGINNING = 347996; # 1 Tishri 1
 
 sub is_leap {
     my $self = shift;
-    my $year = shift || $self->year;
+    my $year = shift;
+    $year=$self->year if ! defined $year;
     my $mod=$year % 19;
     return scalar(grep {$_==$mod} @LEAP_CYCLE);
 }
@@ -260,12 +261,13 @@ sub initialize {
 	if $year<1;
     $$self{year}=$year; $$self{$month}=$month; $$self{day}=$day;
     my $rosh=$self->rosh;
-    my $year_length=rosh Date::Convert::Hebrew ($year+1)-$rosh;
+    my $year_length=(rosh Date::Convert::Hebrew ($year+1))-$rosh;
+    carp "Impossible year length" unless defined $MONTH_START{$year_length};
     my $months_ref=$MONTH_START{$year_length};
     my $days=$$months_ref[$month-1]+$day-1;
     $$self{days}=$days;
-    my $astro=$rosh+$days-1;
-    $$self{astro}=$astro;
+    my $absol=$rosh+$days-1;
+    $$self{absol}=$absol;
 }
 
 
@@ -273,7 +275,7 @@ sub initialize {
 sub year {
     my $self = shift;
     return $$self{year} if exists $$self{year};
-    my $days=$$self{astro};
+    my $days=$$self{absol};
     my $year=int($days/365)-3*365; # just an initial guess, but a good one.
     warn "Date::Convert::Hebrew isn't reliable before the beginning of\n".
 	"\tthe Hebrew calendar" if $days < $HEBREW_BEGINNING;
@@ -290,6 +292,7 @@ sub month {
     my $year_length=
 	rosh Date::Convert::Hebrew ($self->year+1) - 
 	    rosh Date::Convert::Hebrew $self->year;
+    carp "Impossible year length" unless defined $MONTH_START{$year_length};
     my $months_ref=$MONTH_START{$year_length};
     my $days=$$self{days};
     my ($n, $month)=(1);
@@ -329,9 +332,8 @@ sub rosh {
     my $self = shift;
     my $year = shift || $self->year;    
     my @molad= @FIRST_MOLAD;
-    $year--;
-    @molad = &part_add(@molad, &part_mult(int($year/19),@CYCLE_YEARS));
-    my $offset=$year%19;
+    @molad = &part_add(@molad, &part_mult(int(($year-1)/19),@CYCLE_YEARS));
+    my $offset=($year-1)%19;
     my $num_leaps=(grep {$_<=$offset} @LEAP_CYCLE) - 1;
     @molad = &part_add(@molad, &part_mult($num_leaps, @LEAP_YEAR));
     @molad = &part_add(@molad, &part_mult($offset-$num_leaps, 
@@ -344,9 +346,9 @@ sub rosh {
 	or
 	((is_leap Date::Convert::Hebrew $year) and   # gatrad b'shanah
 	 ($guess==2) and                         #      p'shutah g'rosh
-	 (($hour>9)or($hour==9 && $part>=204))) 
-	or
-	((is_leap Date::Convert::Hebrew($year-1)) and # b'to takfat achar
+	 (($hour>9)or($hour==9 && $part>=204)))
+        or
+        ((is_leap Date::Convert::Hebrew $year-1) and # b'to takfat achar
 	 ($guess==1) and                         #      ha'ibur akor
 	 (($hour>15)or($hour==15&&$part>589)))){ #      mi-lishorsh
 	$guess++;
@@ -404,7 +406,7 @@ sub part_mult {
 
 # Here's a quickie, based on the base class.
 
-package Date::Convert::Astro;
+package Date::Convert::Absolute;
 use Date::Convert;
 @ISA = qw ( Date::Convert );
 
@@ -415,7 +417,7 @@ sub initialize {
 
 sub date {
     my $self=shift;
-    return $$self{'astro'};
+    return $$self{'absol'};
 }
 
 sub date_string {
@@ -431,12 +433,48 @@ sub date_string {
 package Date::Convert::Julian;  
 
 use Carp;
-@ISA = qw ( Date::Convert Date::Convert::Gregorian );  
+@ISA = qw ( Date::Convert::Gregorian Date::Convert );  
 # we steal useful constants from Gregorian
 $JULIAN_BEGINNING=$Date::Convert::Gregorian::GREG_BEGINNING - 2;
 $NORMAL_YEAR=     $Date::Convert::Gregorian::NORMAL_YEAR;
 $LEAP_YEAR=       $Date::Convert::Gregorian::LEAP_YEAR;
 $FOUR_YEARS=      $Date::Convert::Gregorian::FOUR_YEARS;
+
+@MONTH_ENDS    = @Date::Convert::Gregorian::MONTH_ENDS;
+@LEAP_ENDS     = @Date::Convert::Gregorian::LEAP_ENDS;
+
+sub initialize {
+    my $self=shift ||
+	croak "Date::Convert::Julian::initialize needs more args";
+    my $year=shift || return Date::Convert::initialize;
+    my $month=shift ||
+	croak "Date::Convert::Julian::initialize needs more args";
+    my $day=shift ||
+	croak "Date::Convert::Julian::initialize needs more args";
+
+    warn "These routines don't work well for Julian before year 1"
+	if $year<1;
+    my $absol = $JULIAN_BEGINNING;
+    $$self{'year'} = $year;
+    $$self{'month'}= $month;
+    $$self{'day'}  = $day;
+    my $is_leap = is_leap Date::Convert::Gregorian $year;
+    $year --;  #get years *before* this year.  Makes math easier.  :)
+    # first, convert year into days. . .
+    $absol += int($year/4)*$FOUR_YEARS;
+    $year  %= 4;
+    $absol += $year*$NORMAL_YEAR;
+    # now, month into days.
+    croak "month number $month out of range" 
+	if $month < 1 || $month >12;
+    my $MONTH_REF=\@MONTH_ENDS;
+    $MONTH_REF=\@LEAP_ENDS if $is_leap;
+    croak "day number $day out of range for month $month"
+	if $day<1 || $day+$$MONTH_REF[$month-1]>$$MONTH_REF[$month];
+    $absol += $day+$$MONTH_REF[$month-1]-1;
+    $$self{absol}=$absol;
+}
+
 
 sub year {
     my $self = shift;
@@ -445,7 +483,7 @@ sub year {
     # To avoid fenceposts, year and days are initially *before* today.
     # the next code is stolen directly form the ::Gregorian code.  Good thing
     # I'm the one who wrote it. . .
-    $days=$$self{astro}-$JULIAN_BEGINNING;
+    $days=$$self{absol}-$JULIAN_BEGINNING;
     $year =  int ($days / $FOUR_YEARS) * 4;
     $days %= $FOUR_YEARS;
     if (($days+1) % $FOUR_YEARS) { # Not on a four-year boundary.  Good!
@@ -494,14 +532,14 @@ Date::Convert - Convert Between any two Calendrical Formats
 
 Currently defined subclasses:
 
-	Date::Convert::Astro
+	Date::Convert::Absolute
 	Date::Convert::Gregorian
 	Date::Convert::Hebrew
 	Date::Convert::Julian
 
 Date::Convert is intended to allow you to convert back and forth between
 any arbitrary date formats (ie. pick any from: Gregorian, Julian, Hebrew,
-Astronomical, and any others that get added on).  It does this by having a
+Absolute, and any others that get added on).  It does this by having a
 separate subclass for each format, and requiring each class to provide
 standardized methods for converting to and from the date format of the base
 class.  In this way, instead of having to code a conversion routine for
@@ -620,13 +658,16 @@ the default way described above for B<new>.)  Note the American spelling of
 
 =head1 SUBCLASS SPECIFIC NOTES
 
-=head2 Astro
+=head2 Absolute
 
-The "astro" calendar is just the number of days from a certain reference
-point.  It has no notion of years, making it an extremely easy calendar for
-conversion purposes.  I believe that the formal names for this are
-"Astronomical Day Number" and "Julian Day Number" (not to be confused with
-the Julian calendar).
+The "Absolute" calendar is just the number of days from a certain reference
+point.  Calendar people should recognize it as the "Julian Day Number" with
+one minor modification:  When you convert a Gregorian day n to absolute,
+you get the JDN of the Gregorian day from noon on.
+
+Since "absolute" has no notion of years it is an extremely easy calendar
+for conversion purposes.  I stole the "absolute" calendar format from
+Reingold's emacs calendar mode, for debugging purposes.
 
 The subclass is little more than the base class, and as the lowest common
 denominator, doesn't have any special functions.
@@ -655,10 +696,10 @@ before the first month, that's not a bug.
 
 It comes with the following additional methods: B<year>, B<month>, B<day>,
 B<is_leap>, B<rosh>, B<part_add>, and B<part_mult>.  B<rosh> returns the
-astro day corresponding to "Rosh HaShana" (New year) for a given year, and
-can also be invoked as a static.  B<part_add> and B<part_mult> are useful
-functions for Hebrew calendrical calculations are not for much else; if
-you're not familiar with the Hebrew calendar, don't worry about them.
+absolute day corresponding to "Rosh HaShana" (New year) for a given year,
+and can also be invoked as a static.  B<part_add> and B<part_mult> are
+useful functions for Hebrew calendrical calculations are not for much else;
+if you're not familiar with the Hebrew calendar, don't worry about them.
 
 
 =head2 Islamic
@@ -685,18 +726,18 @@ you need B<initialize>, B<date>, and B<date_string>.  Of course, helper
 functions would probably help. . .  You do I<not> need to write a B<new> or
 B<convert> function, since the base class handles them nicely.
 
-First, a quick conceptual overhaul: the base class uses an "astronomical
-format" ("Julian day format") borrowed from B<emacs>.  This is just days
-numbered absolutely from an extremely long time ago.  I don't know much
-about it, but it's really easy to use, particularly if you have emacs and
-emacs' B<calendar mode>.  Each Date::Convert object is a reference to a
-hash (as in all OO perl) and includes a special "astro" value stored under
-a reserved "astro" key.  When B<initialize> initializes an object, say a
-Gregorian date, it stores whatever data it was given in the object and it
-also calculates the "astro" equivalent of the date and stores it, too.  If
-the user converts to another date, the object is wiped clean of all data
-except "astro".  Then when the B<date> method for the new format is called,
-it calculates the date in the new format from the "astro" data.
+First, a quick conceptual overhaul: the base class uses an "absolute day
+format" (basically "Julian day format") borrowed from B<emacs>.  This is
+just days numbered absolutely from an extremely long time ago.  It's really
+easy to use, particularly if you have emacs and emacs' B<calendar mode>.
+Each Date::Convert object is a reference to a hash (as in all OO perl) and
+includes a special "absol" value stored under a reserved "absol" key.  When
+B<initialize> initializes an object, say a Gregorian date, it stores
+whatever data it was given in the object and it also calculates the "absol"
+equivalent of the date and stores it, too.  If the user converts to another
+date, the object is wiped clean of all data except "absol".  Then when the
+B<date> method for the new format is called, it calculates the date in the
+new format from the "absol" data.
 
 Now that I've thoroughly confused you, here's a more compartmentalized
 version:
@@ -706,11 +747,11 @@ version:
 =item initialize
 
 Take the date supplied as argument as appropriate to the format, and
-convert it to "astro" format.  Store it as C<$$self{'astro'}>.  You might
+convert it to "absol" format.  Store it as C<$$self{'absol'}>.  You might
 also want to store other data, ie. B<::Gregorian> stores C<$$self{'year'}>,
 C<$$self{'month'}>, and C<$$self{'day'}>.  If no args are supplied,
 explicitly call the base class's initialize,
-ie. C<Date::Convert::initialize>, to initialize with a default 'astro' date
+ie. C<Date::Convert::initialize>, to initialize with a default 'absol' date
 and nothing else.
 
 I<NOTE:>  I may move the default behavior into the new constructor.
@@ -718,11 +759,11 @@ I<NOTE:>  I may move the default behavior into the new constructor.
 =item date
 
 Return the date in a appropriate format.  Note that the only fact that
-B<date> can take as given is that C<$$self{'astro'}> is defined, ie. this
+B<date> can take as given is that C<$$self{'absol'}> is defined, ie. this
 object may I<not> have been initialized by the B<initialize> of this
 object's class.  For instance, you might have it check if C<$$self{'year'}>
 is defined.  If it is, then you have the year component, otherwise, you
-calculate year from C<$$self{'astro'}>.
+calculate year from C<$$self{'absol'}>.
 
 =item date_string
 
@@ -732,7 +773,7 @@ on the values.
 =back
 
 
-I<NOTE:> The B<::Astro> subclass is a special case, since it's nearly an
+I<NOTE:> The B<::Absolute> subclass is a special case, since it's nearly an
 empty subclass (ie. it's just the base class with the required methods
 filled out).  Don't use it as an example!  The easiest code to follow would
 have been B<::Julian> except that Julian inherits from B<::Gregorian>.
@@ -787,7 +828,7 @@ perl(1), Date::DateCalc(3)
 
 =head1 VERSION
 
-Date::Convert 0.14 (pre-alpha)
+Date::Convert 0.15 (pre-alpha)
 
 =head1 AUTHOR
 
