@@ -27,8 +27,59 @@
 #
 use ExtUtils::MakeMaker;
 WriteMakefile(
-    'NAME'      => 'Date::Convert'
-  , 'VERSION'   => '0.17'
-  , 'LICENSE'   => 'perl'
+    'NAME'             => 'Date::Convert'
+  , 'VERSION_FROM'     => 'lib/Date/Convert.pm'
+  , 'ABSTRACT'         => 'Date conversions between Gregorian, Hebrew and Julian'
+  , 'AUTHOR'           => [ 'Mordechai Abzug', 'Jean Forget <JFORGET@cpan.org>' ],
+  , 'LICENSE'          => 'perl'
+  , 'MIN_PERL_VERSION' => '5.8.8'
+  , 'BUILD_REQUIRES'   => { 'Test::More'      => '0'
+                          , 'ExtUtils::MakeMaker' => '6.57_02'
+                           },
+   , META_MERGE       => {
+       'meta-spec'      => { version => 2 },
+       'dynamic_config' => 0,
+       'prereqs' => {
+          'build' => {
+             'requires' => {
+                'ExtUtils::MakeMaker' => '6.57_02'
+             }
+          },
+          'configure' => {
+             'requires' => {
+                'ExtUtils::MakeMaker' => '6.57_02'
+             }
+          },
+       },
+       provides       => {
+           'Date::Convert' => {
+                file => 'lib/Date/Convert.pm',
+                version => '0.17',
+           },
+           'Date::Convert::Absolute' => {
+                file => 'lib/Date/Convert/Absolute.pm',
+                version => '0.17',
+           },
+           'Date::Convert::Gregorian' => {
+                file => 'lib/Date/Convert/Gregorian.pm',
+                version => '0.17',
+           },
+           'Date::Convert::Hebrew' => {
+                file => 'lib/Date/Convert/Hebrew.pm',
+                version => '0.17',
+           },
+           'Date::Convert::Julian' => {
+                file => 'lib/Date/Convert/Julian.pm',
+                version => '0.17',
+           },
+       },
+       resources => {
+           repository => {
+               type => 'git',
+               url  => 'https://github.com/jforget/Date-Convert.git',
+               web  => 'https://github.com/jforget/Date-Convert',
+           },
+       },
+    },
 );
 
