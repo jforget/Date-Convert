@@ -3,7 +3,7 @@ package Date::Convert;
 
 use Carp;
 
-$VERSION="0.16";
+$VERSION="0.17";
 
 
 $VERSION=$VERSION; # to make -w happy.  :)
@@ -828,7 +828,7 @@ perl(1), Date::DateCalc(3)
 
 =head1 VERSION
 
-Date::Convert 0.15 (pre-alpha)
+Date::Convert 0.17 (pre-alpha)
 
 =head1 AUTHOR
 

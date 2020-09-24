@@ -1,6 +1,6 @@
 use ExtUtils::MakeMaker;
 WriteMakefile(
     'NAME'      => 'Date::Convert',
-    'VERSION'   => '0.10'
+    'VERSION'   => '0.17'
 );
 

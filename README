@@ -1,5 +1,6 @@
+-*- encoding: utf-8; indent-tabs-mode: nil -*-
 
-Date::Convert 0.13 pre-alpha by Mordechai T. Abzug <morty@umbc.edu>
+Date::Convert 0.17 pre-alpha by Mordechai T. Abzug <morty@umbc.edu>
 
 Allows you to convert date formats using an OO mechanism that lets you
 easily choose any two formats and add in new ones.

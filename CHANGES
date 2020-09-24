@@ -1,3 +1,7 @@
+-*- encoding: utf-8; indent-tabs-mode: nil -*-
+
+0.17:   released on xxx
+	- xxx
 
 0.16:
 	- BUG: Hebrew broken, off-by-one error in rosh calulations
