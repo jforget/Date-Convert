@@ -7,27 +7,31 @@
 #
 
 package Date::Convert::Hebrew;
+use utf8;
+use strict;
+use warnings;
 use Carp;
-@ISA = qw ( Date::Convert );
 
-$HEBREW_BEGINNING = 347996; # 1 Tishri 1
+our @ISA     = qw ( Date::Convert );
+our $VERSION = "0.17";
+
+my $HEBREW_BEGINNING = 347996; # 1 Tishri 1
                                 # @MONTH       = (29,   12, 793);
-@NORMAL_YEAR = (354,   8, 876); # &part_mult(12,  @MONTH);
-@LEAP_YEAR   = (383,  21, 589); # &part_mult(13,  @MONTH);
-@CYCLE_YEARS = (6939, 16, 595); # &part_mult(235, @MONTH);
-@FIRST_MOLAD = ( 1,  5, 204);
-@LEAP_CYCLE  = qw ( 3 6 8 11 14 17 0 );
+my @NORMAL_YEAR = (354,   8, 876); # &part_mult(12,  @MONTH);
+my @LEAP_YEAR   = (383,  21, 589); # &part_mult(13,  @MONTH);
+my @CYCLE_YEARS = (6939, 16, 595); # &part_mult(235, @MONTH);
+my @FIRST_MOLAD = ( 1,  5, 204);
+my @LEAP_CYCLE  = qw ( 3 6 8 11 14 17 0 );
 
-@MONTHS = ('Nissan', 'Iyyar', 'Sivan', 'Tammuz', 'Av',
-	'Elul', 'Tishrei', 'Cheshvan', 'Kislev', 'Teves',
-	'Shevat', 'Adar', 'Adar II' );
+my @MONTHS = ('Nissan',  'Iyyar',    'Sivan',  'Tammuz', 'Av',     'Elul',
+              'Tishrei', 'Cheshvan', 'Kislev', 'Teves',  'Shevat', 'Adar', 'Adar II' );
 
 # In the Hebrew calendar, the year starts in the seventh month, there can
 # be a leap month, and there are two months with a variable number of days.
 # Rather than calculate do the actual math, let's set up lookup tables based
 # on year length.  :)
 
-%MONTH_START=
+my %MONTH_START=
     ('353' => [177, 207, 236, 266, 295, 325, 1, 31, 60, 89, 118, 148],
      '354' => [178, 208, 237, 267, 296, 326, 1, 31, 60, 90, 119, 149],
      '355' => [179, 209, 238, 268, 297, 327, 1, 31, 61, 91, 120, 150],
@@ -46,7 +50,7 @@ sub is_leap {
 
 sub initialize {
     my $self = shift;
-    my $year = shift || return Date::Convert::initialize;
+    my $year = shift || return Date::Convert->initialize;
     my $month= shift ||
 	croak "Date::Convert::Hebrew::initialize needs more args";
     my $day  = shift ||
@@ -188,6 +192,9 @@ sub part_mult {
     return($day, $hour, $part);
 }
 
+# Instead of the usual boring "1" end-of-package value,
+# just celebrate the Dumas-esque achievement of releasing
+# version 0.17 in 2020, after version 0.16 in 2000
 'Vingt ans après...';
 
 __END__

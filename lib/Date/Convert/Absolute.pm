@@ -9,8 +9,14 @@
 # Here's a quickie, based on the base class.
 
 package Date::Convert::Absolute;
+
+use utf8;
+use strict;
+use warnings;
 use Date::Convert;
-@ISA = qw ( Date::Convert );
+
+our @ISA     = qw ( Date::Convert );
+our $VERSION = "0.17";
 
 sub initialize {
   return Date::Convert::initialize(@_);
@@ -27,6 +33,9 @@ sub date_string {
     return "$date";
 }
 
+# Instead of the usual boring "1" end-of-package value,
+# just celebrate the Dumas-esque achievement of releasing
+# version 0.17 in 2020, after version 0.16 in 2000
 'Vingt ans après...';
 
 __END__

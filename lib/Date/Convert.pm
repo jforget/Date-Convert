@@ -8,16 +8,16 @@
 
 package Date::Convert;
 
+use utf8;
+use strict;
+use warnings;
 use Carp;
 use Date::Convert::Absolute;
 use Date::Convert::Gregorian;
 use Date::Convert::Hebrew;
 use Date::Convert::Julian;
 
-$VERSION="0.17";
-
-
-$VERSION=$VERSION; # to make -w happy.  :)
+our $VERSION = "0.17";
 
 # methods that every class should have:
 # initialize, day, date, date_string
@@ -25,10 +25,9 @@ $VERSION=$VERSION; # to make -w happy.  :)
 # methods that are recommended if applicable:
 # year, month, day, is_leap
 
-
-$BEGINNING=1721426; # 1 Jan 1 in the Gregorian calendar, although technically, 
-                    # the Gregorian calendar didn't exist at the time.
-$VERSION_TODAY=2450522; # today in JDN, when I wrote this.
+my $BEGINNING = 1721426; # 1 Jan 1 in the Gregorian calendar, although technically, 
+                         # the Gregorian calendar didn't exist at the time.
+my $VERSION_TODAY = 2450522; # today in JDN, when I wrote this.
 
 
 sub new { # straight out of the perlobj manpage:
@@ -72,6 +71,9 @@ sub absol {
     return $$self{absol};
 }
 
+# Instead of the usual boring "1" end-of-package value,
+# just celebrate the Dumas-esque achievement of releasing
+# version 0.17 in 2020, after version 0.16 in 2000
 'Vingt ans après...';
 
 __END__
