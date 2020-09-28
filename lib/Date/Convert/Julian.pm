@@ -11,21 +11,27 @@
 
 package Date::Convert::Julian;  
 
+use utf8;
+use strict;
+use warnings;
 use Carp;
-@ISA = qw ( Date::Convert::Gregorian Date::Convert );  
-# we steal useful constants from Gregorian
-$JULIAN_BEGINNING=$Date::Convert::Gregorian::GREG_BEGINNING - 2;
-$NORMAL_YEAR=     $Date::Convert::Gregorian::NORMAL_YEAR;
-$LEAP_YEAR=       $Date::Convert::Gregorian::LEAP_YEAR;
-$FOUR_YEARS=      $Date::Convert::Gregorian::FOUR_YEARS;
 
-@MONTH_ENDS    = @Date::Convert::Gregorian::MONTH_ENDS;
-@LEAP_ENDS     = @Date::Convert::Gregorian::LEAP_ENDS;
+our @ISA = qw ( Date::Convert::Gregorian Date::Convert );  
+
+# we steal useful constants from Gregorian
+my $JULIAN_BEGINNING = $Date::Convert::Gregorian::GREG_BEGINNING - 2;
+my $NORMAL_YEAR      = $Date::Convert::Gregorian::NORMAL_YEAR;
+my $LEAP_YEAR        = $Date::Convert::Gregorian::LEAP_YEAR;
+my $FOUR_YEARS       = $Date::Convert::Gregorian::FOUR_YEARS;
+my @MONTH_ENDS       = @Date::Convert::Gregorian::MONTH_ENDS;
+my @LEAP_ENDS        = @Date::Convert::Gregorian::LEAP_ENDS;
+
+our $VERSION = "0.17";
 
 sub initialize {
     my $self=shift ||
 	croak "Date::Convert::Julian::initialize needs more args";
-    my $year=shift || return Date::Convert::initialize;
+    my $year=shift || return Date::Convert->initialize;
     my $month=shift ||
 	croak "Date::Convert::Julian::initialize needs more args";
     my $day=shift ||
@@ -89,6 +95,9 @@ sub is_leap {
 
 # OK, we're done.  Everything else just gets inherited from Gregorian.
 
+# Instead of the usual boring "1" end-of-package value,
+# just celebrate the Dumas-esque achievement of releasing
+# version 0.17 in 2020, after version 0.16 in 2000
 'Vingt ans après...';
 
 __END__

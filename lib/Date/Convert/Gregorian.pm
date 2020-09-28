@@ -8,21 +8,25 @@
 
 package Date::Convert::Gregorian;
 
+use utf8;
+use strict;
+use warnings;
 use Carp;
-@ISA = qw ( Date::Convert );
 
-$GREG_BEGINNING=1721426; # 1 Jan 1 in the Gregorian calendar, although
-                    # technically, the Gregorian calendar didn't exist at
-                    # the time.
-@MONTHS_SHORT  = qw ( nil Jan Feb Mar Apr May Jun July Aug Sep Oct Nov Dec );
-@MONTH_ENDS    = qw ( 0   31  59  90  120 151 181  212 243 273 304 334 365 );
-@LEAP_ENDS     = qw ( 0   31  60  91  121 152 182  213 244 274 305 335 366 );
+our @ISA = qw ( Date::Convert );
 
-$NORMAL_YEAR    = 365;
-$LEAP_YEAR      = $NORMAL_YEAR + 1;
-$FOUR_YEARS     = 4 * $NORMAL_YEAR + 1; # one leap year every four years
-$CENTURY        = 25 * $FOUR_YEARS - 1; # centuries aren't leap years . . .
-$FOUR_CENTURIES = 4 * $CENTURY + 1;     # . . .except every four centuries.
+our $GREG_BEGINNING=1721426; # 1 Jan 1 in the Gregorian calendar, although
+                             # technically, the Gregorian calendar didn't exist at
+                             # the time.
+our @MONTHS_SHORT  = qw ( nil Jan Feb Mar Apr May Jun July Aug Sep Oct Nov Dec );
+our @MONTH_ENDS    = qw ( 0   31  59  90  120 151 181  212 243 273 304 334 365 );
+our @LEAP_ENDS     = qw ( 0   31  60  91  121 152 182  213 244 274 305 335 366 );
+
+our $NORMAL_YEAR    = 365;
+our $LEAP_YEAR      = $NORMAL_YEAR + 1;
+our $FOUR_YEARS     =  4 * $NORMAL_YEAR + 1; # one leap year every four years
+my  $CENTURY        = 25 * $FOUR_YEARS  - 1; # centuries aren't leap years . . .
+my  $FOUR_CENTURIES =  4 * $CENTURY     + 1; # . . .except every four centuries.
 
 
 sub year {
@@ -110,7 +114,7 @@ sub date_string {
 
 sub initialize {
     my $self = shift;
-    my $year = shift || return Date::Convert::initialize;
+    my $year = shift || return Date::Convert->initialize;
     my $month= shift ||
 	croak "Date::Convert::Gregorian::initialize needs more args";
     my $day  = shift ||
@@ -142,6 +146,9 @@ sub initialize {
     $$self{absol}=$absol;
 }
 
+# Instead of the usual boring "1" end-of-package value,
+# just celebrate the Dumas-esque achievement of releasing
+# version 0.17 in 2020, after version 0.16 in 2000
 'Vingt ans après...';
 
 __END__
