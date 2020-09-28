@@ -12,6 +12,7 @@ use utf8;
 use strict;
 use warnings;
 use Carp;
+use POSIX qw/floor/;
 
 our @ISA = qw ( Date::Convert );
 
@@ -30,43 +31,52 @@ my  $FOUR_CENTURIES =  4 * $CENTURY     + 1; # . . .except every four centuries.
 
 
 sub year {
-    my $self = shift;
-    return $$self{year} if exists $$self{year}; # no point recalculating.
-    my $days;
-    my $year;
-    # note:  years and days are initially days *before* today, rather than
-    # today's date.  This is because of fenceposts.  :)
-    $days =  $$self{absol} - $GREG_BEGINNING;
-    if (($days+1) % $FOUR_CENTURIES) { # normal case
-	$year =  int ($days / $FOUR_CENTURIES) * 400;
-	$days %= $FOUR_CENTURIES;
-	$year += int ($days / $CENTURY) * 100; # years.
-	$days %= $CENTURY;
-	$year += int ($days / $FOUR_YEARS) * 4;
-	$days %= $FOUR_YEARS;
-	if (($days+1) % $FOUR_YEARS) {
-	    $year += int ($days / $NORMAL_YEAR); # fence post from year 1
-	    $days %= $NORMAL_YEAR; 
-	    $days += 1; # today
-	    $year += 1;
-	} else {
-	    $year += int ($days / $NORMAL_YEAR + 1) - 1;
-	    $days =  $LEAP_YEAR;
-	}
-    } else { # exact four century boundary.  Uh oh. . .
-	$year =  int ($days / $FOUR_CENTURIES + 1) * 400;
-	$days =  $LEAP_YEAR; # correction for later.
+  my $self = shift;
+
+  # no point recalculating.
+  return $self->{year}
+    if exists $self->{year};
+
+  my $days;
+  my $year;
+  # note:  years and days are initially days *before* today, rather than
+  # today's date.  This is because of fenceposts.  :)
+  $days =  $self->{absol} - $GREG_BEGINNING;
+  if (($days+1) % $FOUR_CENTURIES) {
+    # normal case
+    $year  = floor ($days / $FOUR_CENTURIES) * 400;
+    $days %= $FOUR_CENTURIES;
+    $year += int ($days / $CENTURY) * 100; # years.
+    $days %= $CENTURY;
+    $year += int ($days / $FOUR_YEARS) * 4;
+    $days %= $FOUR_YEARS;
+    if (($days+1) % $FOUR_YEARS) {
+      $year += int ($days / $NORMAL_YEAR); # fence post from year 1
+      $days %= $NORMAL_YEAR; 
+      $days += 1; # today
+      $year += 1;
     }
-    $$self{year}=$year;
-    $$self{days_into_year}=$days;
-    return $year;
+    else {
+      $year += int ($days / $NORMAL_YEAR + 1) - 1;
+      $days =  $LEAP_YEAR;
+    }
+  }
+  else {
+    # exact four century boundary.  Uh oh. . .
+    $year =  floor ($days / $FOUR_CENTURIES + 1) * 400;
+    $days =  $LEAP_YEAR; # correction for later.
+  }
+  $self->{year}            = $year;
+  $self->{days_into_year } = $days;
+  return $year;
 }
 
 sub is_leap {
-    my $self = shift;
-    my $year = shift || $self->year; # so is_leap can be static or method
-    return 0 if (($year %4) || (($year % 400) && !($year % 100)));
-    return 1;
+  my ($self, $year) = @_;
+  $year = $self->year
+    unless defined($year);
+  return 0 if (($year %4) || (($year % 400) && !($year % 100)));
+  return 1;
 }
 
 
@@ -109,41 +119,41 @@ sub date_string {
     return "$year $MONTHS_SHORT[$month] $day";
 }
 
-
-
-
 sub initialize {
-    my $self = shift;
-    my $year = shift || return Date::Convert->initialize;
-    my $month= shift ||
-	croak "Date::Convert::Gregorian::initialize needs more args";
-    my $day  = shift ||
-	croak "Date::Convert::Gregorian::initialize needs more args";
-    warn "These routines don't work well for Gregorian before year 1"
-	if $year<1;
-    my $absol = $GREG_BEGINNING;
-    $$self{'year'} = $year;
-    $$self{'month'}= $month;
-    $$self{'day'}  = $day;
-    my $is_leap = is_leap Date::Convert::Gregorian $year;
-    $year --;  #get years *before* this year.  Makes math easier.  :)
-    # first, convert year into days. . .
-    $absol += int($year/400)*$FOUR_CENTURIES;
-    $year  %= 400;
-    $absol += int($year/100)*$CENTURY;
-    $year  %= 100;
-    $absol += int($year/4)*$FOUR_YEARS;
-    $year  %= 4;
-    $absol += $year*$NORMAL_YEAR;
-    # now, month into days.
-    croak "month number $month out of range" 
-	if $month < 1 || $month >12;
-    my $MONTH_REF=\@MONTH_ENDS;
-    $MONTH_REF=\@LEAP_ENDS if $is_leap;
-    croak "day number $day out of range for month $month"
-	if $day<1 || $day+$$MONTH_REF[$month-1]>$$MONTH_REF[$month];
-    $absol += $day+$$MONTH_REF[$month-1]-1;
-    $$self{absol}=$absol;
+  my ($self, $year, $month, $day) = @_;
+  return Date::Convert->initialize
+    unless defined($year);
+  croak "Date::Convert::Gregorian::initialize needs more args"
+    unless defined($month)
+       and defined($day);
+  # warn "These routines don't work well for Gregorian before year 1"
+  #   if $year<1;
+  my $absol = $GREG_BEGINNING;
+  $self->{'year'}  = $year;
+  $self->{'month'} = $month;
+  $self->{'day'}   = $day;
+  my $is_leap      = Date::Convert::Gregorian->is_leap($year);
+  $year --;  #get years *before* this year.  Makes math easier.  :)
+
+  # first, convert year into days. . .
+  $absol += floor($year/400) * $FOUR_CENTURIES;
+  $year  %= 400;
+  $absol += int($year/100) * $CENTURY;
+  $year  %= 100;
+  $absol += int($year/4) * $FOUR_YEARS;
+  $year  %= 4;
+  $absol += $year * $NORMAL_YEAR;
+
+  # now, month into days.
+  croak "month number $month out of range" 
+    if $month < 1 || $month > 12;
+  my $MONTH_REF = \@MONTH_ENDS;
+  $MONTH_REF = \@LEAP_ENDS if $is_leap;
+  croak "day number $day out of range for month $month"
+    if   $day < 1
+      || $day + $$MONTH_REF[$month-1] > $$MONTH_REF[$month];
+  $absol += $day + $$MONTH_REF[$month-1] - 1;
+  $self->{absol} = $absol;
 }
 
 # Instead of the usual boring "1" end-of-package value,

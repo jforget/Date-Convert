@@ -50,6 +50,12 @@ WriteMakefile(
                 'ExtUtils::MakeMaker' => '6.57_02'
              }
           },
+          'runtime' => {
+             'requires' => {
+                'POSIX'           => '0',
+                'perl'            => '5.008008',
+             }
+          },
        },
        provides       => {
            'Date::Convert' => {
