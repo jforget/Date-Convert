@@ -30,6 +30,8 @@
 #
 #
 # Checking the conversions
+# See https://rt.cpan.org/Public/Bug/Display.html?id=130291
+# and also https://rt.cpan.org/Public/Bug/Display.html?id=55145 and https://rt.cpan.org/Public/Bug/Display.html?id=98287
 #
 use utf8;
 use strict;

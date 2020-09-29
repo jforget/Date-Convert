@@ -58,9 +58,10 @@ sub initialize {
     warn "These routines don't work well for Hebrew before year 1"
 	if $year<1;
     $$self{year}=$year; $$self{$month}=$month; $$self{day}=$day;
-    my $rosh=$self->rosh;
-    my $year_length=(rosh Date::Convert::Hebrew ($year+1))-$rosh;
-    carp "Impossible year length" unless defined $MONTH_START{$year_length};
+    my $rosh = $self->rosh;
+    my $year_length = Date::Convert::Hebrew->rosh($year+1) - $rosh;
+    carp "Impossible year length $year_length"
+      unless defined $MONTH_START{$year_length};
     my $months_ref=$MONTH_START{$year_length};
     my $days=$$months_ref[$month-1]+$day-1;
     $$self{days}=$days;
@@ -84,10 +85,10 @@ sub year {
 sub month {
     my $self = shift;
     return $$self{month} if exists $$self{month};
-    my $year_length=
-	rosh Date::Convert::Hebrew ($self->year+1) - 
-	    rosh Date::Convert::Hebrew $self->year;
-    carp "Impossible year length" unless defined $MONTH_START{$year_length};
+    my $year_length =   Date::Convert::Hebrew->rosh($self->year+1)
+                      - Date::Convert::Hebrew->rosh($self->year);
+    carp "Impossible year length $year_length"
+      unless defined $MONTH_START{$year_length};
     my $months_ref=$MONTH_START{$year_length};
     my $days=$$self{days};
     my ($n, $month)=(1);
