@@ -74,6 +74,8 @@ sub year {
     return $$self{year} if exists $$self{year};
     my $days=$$self{absol};
     my $year=int($days/365)-3*365; # just an initial guess, but a good one.
+    $year = 0
+      if $year < 0;
     warn "Date::Convert::Hebrew isn't reliable before the beginning of\n".
 	"\tthe Hebrew calendar" if $days < $HEBREW_BEGINNING;
     $year++ while rosh Date::Convert::Hebrew ($year+1)<=$days;
@@ -137,7 +139,7 @@ sub rosh {
     my $guess=$day%7;
     if (($hour>=18)                              # molad zoken al tidrosh
 	or
-	((is_leap Date::Convert::Hebrew $year) and   # gatrad b'shanah
+	((! Date::Convert::Hebrew->is_leap($year)) and   # gatrad b'shanah
 	 ($guess==2) and                         #      p'shutah g'rosh
 	 (($hour>9)or($hour==9 && $part>=204)))
         or
