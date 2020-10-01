@@ -38,7 +38,7 @@ use warnings;
 use Test::More;
 use Date::Convert;
 
-plan(tests => 4);
+plan(tests => 5);
 
 my $date = Date::Convert::Gregorian->new(1957, 9, 25);
 Date::Convert::Hebrew->convert($date);
@@ -55,5 +55,10 @@ is($date->date_string(), "5780 Adar 29", "2020 Mar 25 should be 5780 Adar 29");
 $date = Date::Convert::Julian->new(2100, 3, 1);
 Date::Convert::Gregorian->convert($date);
 Date::Convert::Julian   ->convert($date);
-is($date->date_string(), "2100 Mar 1", 'should be "2100 Mar 1", not "2100 Feb 29"');
+is($date->date_string(), "2100 Mar 1", 'roundtrip from "2100 Mar 1" should arrive at "2100 Mar 1", not "2100 Feb 29"');
+
+$date = Date::Convert::Julian->new(2100, 2, 29);
+Date::Convert::Gregorian->convert($date);
+Date::Convert::Julian   ->convert($date);
+is($date->date_string(), "2100 Feb 29", '"2100 Feb 29" should not crash');
 
