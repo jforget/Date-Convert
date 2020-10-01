@@ -16,3 +16,5 @@ t/heb_and_greg_1.t
 t/hebrew.t
 t/identity.t
 t/julian.t
+t/rt130291.t
+t/rt98287.t
