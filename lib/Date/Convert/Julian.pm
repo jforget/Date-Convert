@@ -43,7 +43,7 @@ sub initialize {
     $$self{'year'} = $year;
     $$self{'month'}= $month;
     $$self{'day'}  = $day;
-    my $is_leap = is_leap Date::Convert::Gregorian $year;
+    my $is_leap = Date::Convert::Julian->is_leap($year);
     $year --;  #get years *before* this year.  Makes math easier.  :)
     # first, convert year into days. . .
     $absol += int($year/4)*$FOUR_YEARS;
