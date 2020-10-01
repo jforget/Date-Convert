@@ -118,8 +118,12 @@ sub date {
 
 
 sub date_string {
-    my $self=shift;
-    return $self->year." $MONTHS[$self->month-1] ".$self->day;
+  my $self = shift;
+  my $month_name = $MONTHS[$self->month - 1];
+  if ($self->month == 12 and $self->is_leap) {
+    $month_name = 'Adar I';
+  }
+  return join ' ', $self->year, $month_name, $self->day;
 }
 
 
