@@ -32,7 +32,7 @@ WriteMakefile(
   , 'ABSTRACT'         => 'Date conversions between Gregorian, Hebrew and Julian'
   , 'AUTHOR'           => [ 'Mordechai Abzug', 'Jean Forget <JFORGET@cpan.org>' ],
   , 'LICENSE'          => 'perl'
-  , 'MIN_PERL_VERSION' => '5.8.8'
+  , 'MIN_PERL_VERSION' => '5.6.0'
   , 'BUILD_REQUIRES'   => { 'Test::More'      => '0'
                           , 'ExtUtils::MakeMaker' => '6.57_02'
                            },
@@ -52,8 +52,12 @@ WriteMakefile(
           },
           'runtime' => {
              'requires' => {
-                'POSIX'           => '0',
-                'perl'            => '5.008008',
+                 'POSIX'           => '0'
+               , 'strict'          => '0'
+               , 'warnings'        => '0'
+               , 'Carp'            => '0'
+               , 'Exporter'        => '0'
+               , 'perl'            => '5.006000'
              }
           },
        },
