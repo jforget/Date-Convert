@@ -15,6 +15,7 @@ use utf8;
 use strict;
 use warnings;
 use Carp;
+use POSIX qw/floor/;
 
 our @ISA = qw ( Date::Convert::Gregorian Date::Convert );  
 
@@ -29,16 +30,15 @@ my @LEAP_ENDS        = @Date::Convert::Gregorian::LEAP_ENDS;
 our $VERSION = "0.17";
 
 sub initialize {
-    my $self=shift ||
-	croak "Date::Convert::Julian::initialize needs more args";
-    my $year=shift || return Date::Convert->initialize;
-    my $month=shift ||
-	croak "Date::Convert::Julian::initialize needs more args";
-    my $day=shift ||
-	croak "Date::Convert::Julian::initialize needs more args";
+  my ($self, $year, $month, $day) = @_;
+  return Date::Convert->initialize
+    unless defined($year);
+  croak "Date::Convert::Julian::initialize needs more args"
+    unless defined($month)
+       and defined($day);
 
-    warn "These routines don't work well for Julian before year 1"
-	if $year<1;
+  # warn "These routines don't work well for Julian before year 1"
+  #     if $year<1;
     my $absol = $JULIAN_BEGINNING;
     $$self{'year'} = $year;
     $$self{'month'}= $month;
@@ -46,7 +46,7 @@ sub initialize {
     my $is_leap = Date::Convert::Julian->is_leap($year);
     $year --;  #get years *before* this year.  Makes math easier.  :)
     # first, convert year into days. . .
-    $absol += int($year/4)*$FOUR_YEARS;
+    $absol += floor($year/4)*$FOUR_YEARS;
     $year  %= 4;
     $absol += $year*$NORMAL_YEAR;
     # now, month into days.
@@ -69,7 +69,7 @@ sub year {
     # the next code is stolen directly form the ::Gregorian code.  Good thing
     # I'm the one who wrote it. . .
     $days=$$self{absol}-$JULIAN_BEGINNING;
-    $year =  int ($days / $FOUR_YEARS) * 4;
+    $year =  floor ($days / $FOUR_YEARS) * 4;
     $days %= $FOUR_YEARS;
     if (($days+1) % $FOUR_YEARS) { # Not on a four-year boundary.  Good!
 	$year += int ($days / $NORMAL_YEAR); # fence post from year 1
@@ -86,10 +86,12 @@ sub year {
 }
 
 sub is_leap {
-    my $self = shift;
-    my $year = shift || $self->year; # so is_leap can be static or method
-    return 0 if ($year %4);
-    return 1;
+  my ($self, $year) = @_;
+  $year = $self->year
+    unless defined($year);
+
+  return 0 if $year %4;
+  return 1;
 }
 
 
