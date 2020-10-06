@@ -65,7 +65,7 @@ sub initialize {
        and defined($day);
 
   # coarse check for month number and day number, it will be refined later.
-  croak "month number $month out of range" 
+  croak "month number $month out of range"
     if $month < 1 || $month > 13;
   croak "day number $day out of range for month $month"
     if   $day < 1
@@ -81,8 +81,8 @@ sub initialize {
 
   my $months_ref = $MONTH_START{$year_length};
   my $months_lg  = $MONTH_LENGTH{$year_length};
-  croak "month number $month out of range" 
-    if $months_ref->[$month - 1] == 0;
+  croak "month number $month out of range"
+    if $month > scalar @$months_ref;
   croak "day number $day out of range for month $month"
     if   $day > $months_lg->[$month - 1];
 
@@ -120,7 +120,7 @@ sub month {
     my $days=$$self{days};
     my ($n, $month)=(1);
     my $day=31; # 31 is too large.  Good.  :)
-    grep {if ($days>=$_ && $days-$_<$day) 
+    grep {if ($days>=$_ && $days-$_<$day)
 	  {$day=$days-$_+1;$month=$n}
 	  $n++} @$months_ref;
     $$self{month}=$month;
@@ -153,8 +153,10 @@ sub date_string {
 
 
 sub rosh {
-    my $self = shift;
-    my $year = shift || $self->year;    
+  my ($self, $year) = @_;
+  $year = $self->year
+    unless defined($year);
+
     my @molad= @FIRST_MOLAD;
     @molad = _part_add(@molad, _part_mult(int(($year-1) / 19), @CYCLE_YEARS));
     my $offset=($year-1)%19;
