@@ -17,9 +17,9 @@ our $VERSION = "0.17";
 
 my $HEBREW_BEGINNING = 347996; # 1 Tishri 1
                                 # @MONTH       = (29,   12, 793);
-my @NORMAL_YEAR = (354,   8, 876); # &part_mult(12,  @MONTH);
-my @LEAP_YEAR   = (383,  21, 589); # &part_mult(13,  @MONTH);
-my @CYCLE_YEARS = (6939, 16, 595); # &part_mult(235, @MONTH);
+my @NORMAL_YEAR = (354,   8, 876); # _part_mult(12,  @MONTH);
+my @LEAP_YEAR   = (383,  21, 589); # _part_mult(13,  @MONTH);
+my @CYCLE_YEARS = (6939, 16, 595); # _part_mult(235, @MONTH);
 my @FIRST_MOLAD = ( 1,  5, 204);
 my @LEAP_CYCLE  = qw ( 3 6 8 11 14 17 0 );
 
@@ -72,12 +72,13 @@ sub initialize {
 sub year {
     my $self = shift;
     return $$self{year} if exists $$self{year};
-    my $days=$$self{absol};
-    my $year=int($days/365)-3*365; # just an initial guess, but a good one.
+    my $days = $self->absol;
+    my $year = int($days / 365) - 3 * 365; # just an initial guess, but a good one.
     $year = 0
       if $year < 0;
-    warn "Date::Convert::Hebrew isn't reliable before the beginning of\n".
-	"\tthe Hebrew calendar" if $days < $HEBREW_BEGINNING;
+    warn "Date::Convert::Hebrew isn't reliable before the beginning of\n"
+         . "\tthe Hebrew calendar"
+      if $days < $HEBREW_BEGINNING;
     $year++ while rosh Date::Convert::Hebrew ($year+1)<=$days;
     $$self{year}=$year;
     $$self{days}=$days-(rosh Date::Convert::Hebrew $year)+1;
@@ -131,12 +132,11 @@ sub rosh {
     my $self = shift;
     my $year = shift || $self->year;    
     my @molad= @FIRST_MOLAD;
-    @molad = &part_add(@molad, &part_mult(int(($year-1)/19),@CYCLE_YEARS));
+    @molad = _part_add(@molad, _part_mult(int(($year-1) / 19), @CYCLE_YEARS));
     my $offset=($year-1)%19;
     my $num_leaps=(grep {$_<=$offset} @LEAP_CYCLE) - 1;
-    @molad = &part_add(@molad, &part_mult($num_leaps, @LEAP_YEAR));
-    @molad = &part_add(@molad, &part_mult($offset-$num_leaps, 
-					      @NORMAL_YEAR));
+    @molad = _part_add(@molad, _part_mult($num_leaps          , @LEAP_YEAR));
+    @molad = _part_add(@molad, _part_mult($offset - $num_leaps, @NORMAL_YEAR));
     my $day=shift @molad;
     my $hour=shift @molad;
     my $part= shift @molad;
@@ -162,7 +162,7 @@ sub rosh {
     return ($day+1+$HEBREW_BEGINNING);
 }
 
-sub part_add {
+sub _part_add {
     my ($day1, $hour1, $part1)=(shift, shift, shift);
     my ($day2, $hour2, $part2)=(shift, shift, shift);
     my $part=$part1+$part2;
@@ -180,7 +180,7 @@ sub part_add {
 }
 
 
-sub part_mult {
+sub _part_mult {
     my $scalar = shift;
     my $day= ((0+ shift) * $scalar);
     my $hour=((0+ shift) * $scalar);

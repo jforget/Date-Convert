@@ -41,7 +41,7 @@ sub year {
   my $year;
   # note:  years and days are initially days *before* today, rather than
   # today's date.  This is because of fenceposts.  :)
-  $days =  $self->{absol} - $GREG_BEGINNING;
+  $days =  $self->absol - $GREG_BEGINNING;
   if (($days+1) % $FOUR_CENTURIES) {
     # normal case
     $year  = floor ($days / $FOUR_CENTURIES) * 400;
@@ -58,7 +58,7 @@ sub year {
     }
     else {
       $year += int ($days / $NORMAL_YEAR + 1) - 1;
-      $days =  $LEAP_YEAR;
+      $days  = $LEAP_YEAR;
     }
   }
   else {

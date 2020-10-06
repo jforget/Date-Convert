@@ -68,7 +68,7 @@ sub year {
     # To avoid fenceposts, year and days are initially *before* today.
     # the next code is stolen directly form the ::Gregorian code.  Good thing
     # I'm the one who wrote it. . .
-    $days=$$self{absol}-$JULIAN_BEGINNING;
+    $days = $self->absol - $JULIAN_BEGINNING;
     $year =  floor ($days / $FOUR_YEARS) * 4;
     $days %= $FOUR_YEARS;
     if (($days+1) % $FOUR_YEARS) { # Not on a four-year boundary.  Good!
