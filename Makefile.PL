@@ -56,7 +56,6 @@ WriteMakefile(
                , 'strict'          => '0'
                , 'warnings'        => '0'
                , 'Carp'            => '0'
-               , 'Exporter'        => '0'
                , 'perl'            => '5.006000'
              }
           },

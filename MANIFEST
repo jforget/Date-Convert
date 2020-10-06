@@ -12,7 +12,6 @@ lib/Date/Convert/Hebrew.pm
 lib/Date/Convert/Julian.pm
 t/absolute.t
 t/heb_and_greg.t
-t/heb_and_greg_1.t
 t/hebrew.t
 t/identity.t
 t/julian.t
