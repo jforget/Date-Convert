@@ -11,6 +11,7 @@ lib/Date/Convert/Gregorian.pm
 lib/Date/Convert/Hebrew.pm
 lib/Date/Convert/Julian.pm
 t/absolute.t
+t/checks.t
 t/heb_and_greg.t
 t/hebrew.t
 t/identity.t
