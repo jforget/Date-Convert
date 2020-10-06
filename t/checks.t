@@ -36,7 +36,7 @@ BEGIN {
   plan skip_all => "Test::Exception needed" if $@;
 }
 
-plan tests => 24;
+plan tests => 25;
 
 my $d;
 dies_ok { Date::Convert::Gregorian->new(2020         ) }  "missing month";
@@ -59,10 +59,13 @@ dies_ok { Date::Convert::Julian->new(2021,  2,  29) }  "day out of range";
 
 dies_ok { Date::Convert::Hebrew->new(5780         ) }  "missing month";
 dies_ok { Date::Convert::Hebrew->new(5780, 10     ) }  "missing day";
+
 dies_ok { Date::Convert::Hebrew->new(5780, -3,   6) }  "month out of range";
-dies_ok { Date::Convert::Hebrew->new(5780, 14,   6) }  "month out of range";
+dies_ok { Date::Convert::Hebrew->new(5780, 13,   6) }  "month out of range";
+dies_ok { Date::Convert::Hebrew->new(5779, 14,   6) }  "month out of range";
+
 dies_ok { Date::Convert::Hebrew->new(5780, 10,  36) }  "day out of range";
 dies_ok { Date::Convert::Hebrew->new(5780, 10,  -6) }  "day out of range";
 dies_ok { Date::Convert::Hebrew->new(5780,  2,  30) }  "day out of range";
-dies_ok { Date::Convert::Hebrew->new(5781,  2,  29) }  "day out of range";
+dies_ok { Date::Convert::Hebrew->new(5781,  8,  30) }  "day out of range";
 

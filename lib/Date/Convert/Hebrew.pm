@@ -39,6 +39,14 @@ my %MONTH_START=
      '384' => [208, 238, 267, 297, 326, 356, 1, 31, 60, 90, 119, 149, 179],
      '385' => [209, 239, 268, 298, 327, 357, 1, 31, 61, 91, 120, 150, 180]);
 
+my %MONTH_LENGTH =
+    ('353' => [30, 29, 30, 29, 30, 29, 30, 29, 29, 29, 30, 29],
+     '354' => [30, 29, 30, 29, 30, 29, 30, 29, 30, 29, 30, 29],
+     '355' => [30, 29, 30, 29, 30, 29, 30, 30, 30, 29, 30, 29],
+     '383' => [30, 29, 30, 29, 30, 29, 30, 29, 29, 29, 30, 30, 29],
+     '384' => [30, 29, 30, 29, 30, 29, 30, 29, 30, 29, 30, 30, 29],
+     '385' => [30, 29, 30, 29, 30, 29, 30, 30, 30, 29, 30, 30, 29]);
+
 sub is_leap {
     my $self = shift;
     my $year = shift;
@@ -49,12 +57,20 @@ sub is_leap {
 
 
 sub initialize {
-    my $self = shift;
-    my $year = shift || return Date::Convert->initialize;
-    my $month= shift ||
-	croak "Date::Convert::Hebrew::initialize needs more args";
-    my $day  = shift ||
-	croak "Date::Convert::Hebrew::initialize needs more args";
+  my ($self, $year, $month, $day) = @_;
+  return Date::Convert->initialize
+    unless defined($year);
+  croak "Date::Convert::Gregorian::initialize needs more args"
+    unless defined($month)
+       and defined($day);
+
+  # coarse check for month number and day number, it will be refined later.
+  croak "month number $month out of range" 
+    if $month < 1 || $month > 13;
+  croak "day number $day out of range for month $month"
+    if   $day < 1
+      || $day > 30;
+
     warn "These routines don't work well for Hebrew before year 1"
 	if $year<1;
     $$self{year}=$year; $$self{$month}=$month; $$self{day}=$day;
@@ -62,9 +78,17 @@ sub initialize {
     my $year_length = Date::Convert::Hebrew->rosh($year+1) - $rosh;
     carp "Impossible year length $year_length"
       unless defined $MONTH_START{$year_length};
-    my $months_ref=$MONTH_START{$year_length};
+
+  my $months_ref = $MONTH_START{$year_length};
+  my $months_lg  = $MONTH_LENGTH{$year_length};
+  croak "month number $month out of range" 
+    if $months_ref->[$month - 1] == 0;
+  croak "day number $day out of range for month $month"
+    if   $day > $months_lg->[$month - 1];
+
     my $days=$$months_ref[$month-1]+$day-1;
     $$self{days}=$days;
+
     my $absol=$rosh+$days-1;
     $$self{absol}=$absol;
 }
