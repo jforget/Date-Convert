@@ -27,7 +27,7 @@
 #     Inc., <https://www.fsf.org/>.
 #
 #
-# Checking the value checks.
+# Checking the call of method "new" without parameters.
 #
 use Test::More;
 use Date::Convert;
