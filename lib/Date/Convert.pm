@@ -40,16 +40,17 @@ sub new { # straight out of the perlobj manpage:
 
 
 sub initialize {
-    my $self = shift;
-    my $val  = shift || $VERSION_TODAY;
-    carp "Date::Convert is not reliable before Absolute $BEGINNING" 
-	if $val < $BEGINNING;
-    $$self{absol}=$val;
+  my ($self, $val) = @_;
+  $val  = $VERSION_TODAY
+    unless defined($val);
+  carp "Date::Convert is not reliable before Absolute $BEGINNING" 
+      if $val < $BEGINNING;
+  $self->{absol} = $val;
 }
 
 
 
-sub clean {
+sub _clean {
     my $self  = shift;
     my $key;
     foreach $key (keys %$self) {
@@ -62,7 +63,7 @@ sub clean {
 sub convert {
     my $class = shift;
     my $self  = shift;
-    $self->clean;
+    $self->_clean;
     bless $self, $class;
 }
 

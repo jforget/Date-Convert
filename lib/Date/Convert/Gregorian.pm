@@ -121,7 +121,7 @@ sub date_string {
 
 sub initialize {
   my ($self, $year, $month, $day) = @_;
-  return Date::Convert->initialize
+  return $self->Date::Convert::initialize
     unless defined($year);
   croak "Date::Convert::Gregorian::initialize needs more args"
     unless defined($month)

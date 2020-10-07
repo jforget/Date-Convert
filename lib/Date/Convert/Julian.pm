@@ -31,7 +31,7 @@ our $VERSION = "0.17";
 
 sub initialize {
   my ($self, $year, $month, $day) = @_;
-  return Date::Convert->initialize
+  return $self->Date::Convert::initialize
     unless defined($year);
   croak "Date::Convert::Julian::initialize needs more args"
     unless defined($month)

@@ -21,6 +21,7 @@ my @NORMAL_YEAR = ( 354,  8, 876); # _part_mult(12,  @MONTH);
 my @LEAP_YEAR   = ( 383, 21, 589); # _part_mult(13,  @MONTH);
 my @CYCLE_YEARS = (6939, 16, 595); # _part_mult(235, @MONTH);
 my @FIRST_MOLAD = (   1,  5, 204);
+
 my @LEAP_BOOL   = qw ( 1 0 0 1 0 0 1 0 1 0 0 1 0 0 1 0 0 1 0 );
 my @LEAP_CYCLE  = qw (       3     6   8    11    14    17 
                        0 );
@@ -60,7 +61,7 @@ sub is_leap {
 
 sub initialize {
   my ($self, $year, $month, $day) = @_;
-  return Date::Convert->initialize
+  return $self->Date::Convert::initialize
     unless defined($year);
   croak "Date::Convert::Gregorian::initialize needs more args"
     unless defined($month)
