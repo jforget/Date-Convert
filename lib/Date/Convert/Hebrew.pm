@@ -16,12 +16,14 @@ our @ISA     = qw ( Date::Convert );
 our $VERSION = "0.17";
 
 my $HEBREW_BEGINNING = 347996; # 1 Tishri 1
-                                # @MONTH       = (29,   12, 793);
-my @NORMAL_YEAR = (354,   8, 876); # _part_mult(12,  @MONTH);
-my @LEAP_YEAR   = (383,  21, 589); # _part_mult(13,  @MONTH);
+#  @MONTH       = (  29, 12, 793);
+my @NORMAL_YEAR = ( 354,  8, 876); # _part_mult(12,  @MONTH);
+my @LEAP_YEAR   = ( 383, 21, 589); # _part_mult(13,  @MONTH);
 my @CYCLE_YEARS = (6939, 16, 595); # _part_mult(235, @MONTH);
-my @FIRST_MOLAD = ( 1,  5, 204);
-my @LEAP_CYCLE  = qw ( 3 6 8 11 14 17 0 );
+my @FIRST_MOLAD = (   1,  5, 204);
+my @LEAP_BOOL   = qw ( 1 0 0 1 0 0 1 0 1 0 0 1 0 0 1 0 0 1 0 );
+my @LEAP_CYCLE  = qw (       3     6   8    11    14    17 
+                       0 );
 
 my @MONTHS = ('Nissan',  'Iyyar',    'Sivan',  'Tammuz', 'Av',     'Elul',
               'Tishrei', 'Cheshvan', 'Kislev', 'Teves',  'Shevat', 'Adar', 'Adar II' );
@@ -50,9 +52,9 @@ my %MONTH_LENGTH =
 sub is_leap {
     my $self = shift;
     my $year = shift;
-    $year=$self->year if ! defined $year;
-    my $mod=$year % 19;
-    return scalar(grep {$_==$mod} @LEAP_CYCLE);
+    $year = $self->year if ! defined $year;
+    my $mod = $year % 19;
+    return $LEAP_BOOL[$mod];
 }
 
 
@@ -68,23 +70,26 @@ sub initialize {
   croak "month number $month out of range"
     if $month < 1 || $month > 13;
   croak "day number $day out of range for month $month"
-    if   $day < 1
-      || $day > 30;
+    if   $day < 1 || $day > 30;
 
     warn "These routines don't work well for Hebrew before year 1"
 	if $year<1;
     $$self{year}=$year; $$self{$month}=$month; $$self{day}=$day;
     my $rosh = $self->rosh;
     my $year_length = Date::Convert::Hebrew->rosh($year+1) - $rosh;
-    carp "Impossible year length $year_length"
-      unless defined $MONTH_START{$year_length};
+
+  # If this error is triggered, that means there is a bug in Date::Convert::Hebrew.
+  # It does not mean that the user sent input parameters with invalid values.
+  carp "Impossible year length $year_length"
+    unless defined $MONTH_START{$year_length};
 
   my $months_ref = $MONTH_START{$year_length};
-  my $months_lg  = $MONTH_LENGTH{$year_length};
+
+  # refined check for month number and day number
   croak "month number $month out of range"
     if $month > scalar @$months_ref;
   croak "day number $day out of range for month $month"
-    if   $day > $months_lg->[$month - 1];
+    if   $day > $MONTH_LENGTH{$year_length}[$month - 1];
 
     my $days=$$months_ref[$month-1]+$day-1;
     $$self{days}=$days;
@@ -114,8 +119,12 @@ sub month {
     return $$self{month} if exists $$self{month};
     my $year_length =   Date::Convert::Hebrew->rosh($self->year+1)
                       - Date::Convert::Hebrew->rosh($self->year);
-    carp "Impossible year length $year_length"
-      unless defined $MONTH_START{$year_length};
+
+  # If this error is triggered, that means there is a bug in Date::Convert::Hebrew.
+  # It does not mean that the user sent input parameters with invalid values.
+  carp "Impossible year length $year_length"
+    unless defined $MONTH_START{$year_length};
+
     my $months_ref=$MONTH_START{$year_length};
     my $days=$$self{days};
     my ($n, $month)=(1);
