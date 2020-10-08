@@ -110,18 +110,18 @@ sub year {
   return $self->{year}
     if exists $self->{year};
 
-    my $days = $self->absol;
-    my $year = int($days / 365) - 3 * 365; # just an initial guess, but a good one.
-    $year = 0
-      if $year < 0;
-    warn "Date::Convert::Hebrew isn't reliable before the beginning of\n"
-         . "\tthe Hebrew calendar"
-      if $days < $HEBREW_BEGINNING;
-    $year++
-      while Date::Convert::Hebrew->rosh($year+1) <= $days;
-    $self->{year} = $year;
-    $self->{days} = $days - Date::Convert::Hebrew->rosh($year) + 1;
-    return $year;
+  my $days = $self->absol;
+  my $year = int($days / 365) - 3 * 365; # just an initial guess, but a good one.
+  $year = 0
+    if $year < 0;
+  warn "Date::Convert::Hebrew isn't reliable before the beginning of\n\tthe Hebrew calendar"
+    if $days < $HEBREW_BEGINNING;
+
+  $year++
+    while Date::Convert::Hebrew->rosh($year+1) <= $days;
+  $self->{year} = $year;
+  $self->{days} = $days - Date::Convert::Hebrew->rosh($year) + 1;
+  return $year;
 }
 
 sub month {
@@ -131,24 +131,29 @@ sub month {
   return $self->{month}
     if exists $self->{month};
 
-    my $year_length =   Date::Convert::Hebrew->rosh($self->year+1)
-                      - Date::Convert::Hebrew->rosh($self->year);
+  my $year_length =   Date::Convert::Hebrew->rosh($self->year+1)
+                    - Date::Convert::Hebrew->rosh($self->year);
 
   # If this error is triggered, that means there is a bug in Date::Convert::Hebrew.
   # It does not mean that the user sent input parameters with invalid values.
   carp "Impossible year length $year_length"
     unless defined $MONTH_START{$year_length};
 
-    my $months_ref=$MONTH_START{$year_length};
-    my $days=$$self{days};
-    my ($n, $month)=(1);
-    my $day=31; # 31 is too large.  Good.  :)
-    grep {if ($days>=$_ && $days-$_<$day)
-	  {$day=$days-$_+1;$month=$n}
-	  $n++} @$months_ref;
-    $$self{month}=$month;
-    $$self{day}=$day;
-    return $month;
+  my $months_ref  = $MONTH_START{$year_length};
+  my $days        = $self->{days};
+  my ($n, $month) = (1);
+  my $day         = 31; # 31 is too large.  Good.  :)
+
+  for (@$months_ref) {
+    if ($days>=$_ && $days-$_<$day) {
+      $day   = $days - $_ + 1;
+      $month = $n
+    }
+    $n++;
+  }
+  $self->{month} = $month;
+  $self->{day}   = $day;
+  return $month;
 }
 
 sub day {
