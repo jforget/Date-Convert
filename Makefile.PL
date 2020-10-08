@@ -59,6 +59,11 @@ WriteMakefile(
                , 'perl'            => '5.006000'
              }
           },
+          'test' => {
+             'recommends' => {
+                  'Test::Exception' => '0'
+             }
+          },
        },
        provides       => {
            'Date::Convert' => {
