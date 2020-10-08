@@ -22,6 +22,9 @@ my @LEAP_YEAR   = ( 383, 21, 589); # _part_mult(13,  @MONTH);
 my @CYCLE_YEARS = (6939, 16, 595); # _part_mult(235, @MONTH);
 my @FIRST_MOLAD = (   1,  5, 204);
 
+#
+# Which years in the Metonic cycle are leap years?
+#
 my @LEAP_BOOL   = qw ( 1 0 0 1 0 0 1 0 1 0 0 1 0 0 1 0 0 1 0 );
 my @LEAP_CYCLE  = qw (       3     6   8    11    14    17 
                        0 );
@@ -73,11 +76,13 @@ sub initialize {
   croak "day number $day out of range for month $month"
     if   $day < 1 || $day > 30;
 
-    warn "These routines don't work well for Hebrew before year 1"
-	if $year<1;
-    $$self{year}=$year; $$self{$month}=$month; $$self{day}=$day;
-    my $rosh = $self->rosh;
-    my $year_length = Date::Convert::Hebrew->rosh($year+1) - $rosh;
+  warn "These routines don't work well for Hebrew before year 1"
+    if $year<1;
+  $self->{year}   = $year;
+  $self->{$month} = $month;
+  $self->{day}    = $day;
+  my $rosh = $self->rosh;
+  my $year_length = Date::Convert::Hebrew->rosh($year+1) - $rosh;
 
   # If this error is triggered, that means there is a bug in Date::Convert::Hebrew.
   # It does not mean that the user sent input parameters with invalid values.
@@ -92,16 +97,19 @@ sub initialize {
   croak "day number $day out of range for month $month"
     if   $day > $MONTH_LENGTH{$year_length}[$month - 1];
 
-    my $days=$$months_ref[$month-1]+$day-1;
-    $$self{days}=$days;
-
-    my $absol=$rosh+$days-1;
-    $$self{absol}=$absol;
+  my $days  = $months_ref->[$month-1] + $day - 1;
+  my $absol = $rosh + $days - 1;
+  $self->{days}  = $days;
+  $self->{absol} = $absol;
 }
 
 sub year {
-    my $self = shift;
-    return $$self{year} if exists $$self{year};
+  my $self = shift;
+
+  # no point recalculating.
+  return $self->{year}
+    if exists $self->{year};
+
     my $days = $self->absol;
     my $year = int($days / 365) - 3 * 365; # just an initial guess, but a good one.
     $year = 0
@@ -109,15 +117,20 @@ sub year {
     warn "Date::Convert::Hebrew isn't reliable before the beginning of\n"
          . "\tthe Hebrew calendar"
       if $days < $HEBREW_BEGINNING;
-    $year++ while rosh Date::Convert::Hebrew ($year+1)<=$days;
-    $$self{year}=$year;
-    $$self{days}=$days-(rosh Date::Convert::Hebrew $year)+1;
+    $year++
+      while Date::Convert::Hebrew->rosh($year+1) <= $days;
+    $self->{year} = $year;
+    $self->{days} = $days - Date::Convert::Hebrew->rosh($year) + 1;
     return $year;
 }
 
 sub month {
-    my $self = shift;
-    return $$self{month} if exists $$self{month};
+  my $self = shift;
+
+  # no point recalculating.
+  return $self->{month}
+    if exists $self->{month};
+
     my $year_length =   Date::Convert::Hebrew->rosh($self->year+1)
                       - Date::Convert::Hebrew->rosh($self->year);
 
@@ -139,8 +152,12 @@ sub month {
 }
 
 sub day {
-    my $self = shift;
-    return $$self{day} if exists $$self{day};
+  my $self = shift;
+
+  # no point recalculating.
+  return $self->{day}
+    if exists $self->{day};
+
     $self->month; # calculates day as a side-effect.
     return $$self{day};
 }
