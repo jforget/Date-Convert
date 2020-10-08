@@ -47,10 +47,11 @@ sub initialize {
   croak "day number $day out of range for month $month"
     if $day<1 || $day + $MONTH_REF->[$month-1] > $MONTH_REF->[$month];
 
+  $self->{year}  = $year;
+  $self->{month} = $month;
+  $self->{day}   = $day;
+
     my $absol = $JULIAN_BEGINNING;
-    $$self{'year'} = $year;
-    $$self{'month'}= $month;
-    $$self{'day'}  = $day;
     $year --;  #get years *before* this year.  Makes math easier.  :)
     # first, convert year into days. . .
     $absol += floor($year/4)*$FOUR_YEARS;
