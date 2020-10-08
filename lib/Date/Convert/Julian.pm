@@ -39,23 +39,24 @@ sub initialize {
 
   # warn "These routines don't work well for Julian before year 1"
   #     if $year<1;
+  croak "month number $month out of range" 
+    if $month < 1 || $month >12;
+  my $is_leap = Date::Convert::Julian->is_leap($year);
+  my $MONTH_REF = \@MONTH_ENDS;
+  $MONTH_REF    = \@LEAP_ENDS if $is_leap;
+  croak "day number $day out of range for month $month"
+    if $day<1 || $day + $MONTH_REF->[$month-1] > $MONTH_REF->[$month];
+
     my $absol = $JULIAN_BEGINNING;
     $$self{'year'} = $year;
     $$self{'month'}= $month;
     $$self{'day'}  = $day;
-    my $is_leap = Date::Convert::Julian->is_leap($year);
     $year --;  #get years *before* this year.  Makes math easier.  :)
     # first, convert year into days. . .
     $absol += floor($year/4)*$FOUR_YEARS;
     $year  %= 4;
     $absol += $year*$NORMAL_YEAR;
     # now, month into days.
-    croak "month number $month out of range" 
-	if $month < 1 || $month >12;
-    my $MONTH_REF=\@MONTH_ENDS;
-    $MONTH_REF=\@LEAP_ENDS if $is_leap;
-    croak "day number $day out of range for month $month"
-	if $day<1 || $day+$$MONTH_REF[$month-1]>$$MONTH_REF[$month];
     $absol += $day+$$MONTH_REF[$month-1]-1;
     $$self{absol}=$absol;
 }
