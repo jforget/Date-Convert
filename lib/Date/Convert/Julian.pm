@@ -51,15 +51,16 @@ sub initialize {
   $self->{month} = $month;
   $self->{day}   = $day;
 
-    my $absol = $JULIAN_BEGINNING;
-    $year --;  #get years *before* this year.  Makes math easier.  :)
-    # first, convert year into days. . .
-    $absol += floor($year/4)*$FOUR_YEARS;
-    $year  %= 4;
-    $absol += $year*$NORMAL_YEAR;
-    # now, month into days.
-    $absol += $day+$$MONTH_REF[$month-1]-1;
-    $$self{absol}=$absol;
+  $year --;  #get years *before* this year.  Makes math easier.  :)
+  # first, convert year into days. . .
+  my $absol = $JULIAN_BEGINNING;
+  $absol   += floor($year / 4) * $FOUR_YEARS;
+  $year    %= 4;
+  $absol   += $year * $NORMAL_YEAR;
+
+  # now, month into days.
+  $absol += $day + $MONTH_REF->[$month-1] - 1;
+  $self->{absol}=$absol;
 }
 
 
