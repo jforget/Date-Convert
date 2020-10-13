@@ -1,7 +1,7 @@
 # -*- encoding: utf-8; indent-tabs-mode: nil -*-
 #
 #     Utility module to deal with daycounts (or Absolute dates) in Date::Convert
-#     Copyright © 1997, 2000, 2020 Mordechai Abzug and Jean Forget
+#     Copyright (c) 1997, 2000, 2020 Mordechai Abzug and Jean Forget
 #
 #     See the license in the embedded documentation below.
 #
@@ -48,6 +48,27 @@ Date::Convert::Absolute - Utility module to deal with daycounts (or Absolute dat
 
 See the full documentation in the main module L<Date::Convert>.
 
+=head1 METHODS
+
+=head2 C<new>
+
+Create a  new object. You  must provide one positional  parameter: the
+JDN number at noon for the date.
+
+=head2 C<convert>
+
+Use an  existing C<Date::Convert::>I<xxx>  object and convert  it into
+the C<Date::Convert::Absolute> class.
+
+=head2 C<absol>, C<date_string>
+
+Accessors,  just  like  the  base  class  C<Date::Convert>  and  other
+classes.
+
+=head2 C<date>
+
+Accessor, gives the JDN value at noon for the object.
+
 =head1 NOTES ON ABSOLUTE PACKAGE
 
 The "Absolute"  calendar is  just the  number of  days from  a certain
@@ -71,12 +92,12 @@ Unofficial co-maintainer: Jean Forget <JFORGET at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright  © 1997,  2000, 2020  Mordechai Abzug  and Jean  Forget. All
+Copyright (c)  1997, 2000, 2020  Mordechai Abzug and Jean  Forget. All
 rights reserved.
 
 This  program  is  free  software. You  can  distribute,  modify,  and
-otherwise  mangle Date::Convert::French_Rev  under the  same terms  as
-Perl 5.16.3: GNU  Public License version 1 or later  and Perl Artistic
+otherwise mangle Date::Convert::Absolute under  the same terms as Perl
+5.16.3:  GNU Public  License  version  1 or  later  and Perl  Artistic
 License
 
 You can  find the text  of the licenses  in the F<LICENSE> file  or at
