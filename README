@@ -1,20 +1,39 @@
 -*- encoding: utf-8; indent-tabs-mode: nil -*-
 
-Date::Convert 0.17 pre-alpha by Mordechai T. Abzug <morty@umbc.edu>
+Date::Convert 0.17 pre-alpha by Mordechai T. Abzug
+and Jean Forget <JFORGET at cpan dot org>
 
 Allows you to convert date formats using an OO mechanism that lets you
-easily choose any two formats and add in new ones.
+easily choose any two formats and add in new ones. Example:
+
+  use Date::Convert;
+  my $today = Date::Convert::Gregorian->new(2020, 10, 12);
+  print "Gregorian: ", $today->date_string, "\n";
+  # ---> Gregorian: 2020 Oct 12
+
+  Date::Convert::Julian->convert($today);
+  print "Julian: ", $today->date_string, "\n";
+  # ---> Julian: 2020 Sep 29
+
+  Date::Convert::Hebrew->convert($today);
+  print "Hebrew: ", $today->date_string, "\n";
+  # ---> Hebrew: 5781 Tishrei 24
+
+  Date::Convert::Absolute->convert($today);
+  print "Julian Day Number at noon: ", $today->date_string, "\n";
+  # ---> Julian Day Number at noon: 2459135
 
 At the moment, the only documentation is the man page.  That's not
 surprising, since it *is* pre-alpha.  And of course, since it's pre-alpha,
 'tis subject to change, and is unreliable.
 
-Install the normal way:
+Install the normal way, using cpanminus or the CPAN shell, or by running
+the usual commands:
 
-perl Makefile.PL
-make
-make test
-make install
+  perl Makefile.PL
+  make
+  make test
+  make install
 
 If you have suggestions, bug reports, or if you want to add a new date
 format, feel free to contact me:  morty@sanctuary.arbutus.md.us

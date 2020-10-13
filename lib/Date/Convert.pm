@@ -25,7 +25,7 @@ our $VERSION = "0.17";
 # methods that are recommended if applicable:
 # year, month, day, is_leap
 
-my $BEGINNING = 1721426; # 1 Jan 1 in the Gregorian calendar, although technically, 
+my $BEGINNING = 1721426; # 1 Jan 1 in the Gregorian calendar, although technically,
                          # the Gregorian calendar didn't exist at the time.
 my $VERSION_TODAY = 2450522; # today in JDN, when I wrote this.
 
@@ -43,7 +43,7 @@ sub initialize {
   my ($self, $val) = @_;
   $val  = $VERSION_TODAY
     unless defined($val);
-  carp "Date::Convert is not reliable before Absolute $BEGINNING" 
+  carp "Date::Convert is not reliable before Absolute $BEGINNING"
       if $val < $BEGINNING;
   $self->{absol} = $val;
 }
@@ -81,23 +81,18 @@ __END__
 
 =head1 NAME
 
-Date::Convert - Convert Between any two Calendrical Formats
+Date::Convert - Convert Between Calendrical Formats
 
 =head1 SYNOPSIS
 
-	use Date::Convert;
+  use Date::Convert;
 
-	$date=new Date::Convert::Gregorian(1997, 11, 27);
-	@date=$date->date;
-	convert Date::Convert::Hebrew $date;
-	print $date->date_string, "\n";
+  my $date = Date::Convert::Gregorian->new(1997, 11, 27);
+  @date    = $date->date;
+  Date::Convert::Hebrew->convert($date);
+  print $date->date_string, "\n";
 
-Currently defined subclasses:
-
-	Date::Convert::Absolute
-	Date::Convert::Gregorian
-	Date::Convert::Hebrew
-	Date::Convert::Julian
+=head1 DESCRIPTION
 
 Date::Convert is intended to allow you to convert back and forth between
 any arbitrary date formats (ie. pick any from: Gregorian, Julian, Hebrew,
@@ -108,20 +103,25 @@ class.  In this way, instead of having to code a conversion routine for
 going between and two arbitrary formats foo and bar, the function only
 needs to convert foo to the base class and the base class to bar.  Ie:
 
-	Gregorian <--> Base class <--> Hebrew
+  Gregorian <--> Base class <--> Hebrew
 
 The base class includes a B<Convert> method to do this transparently.
 
-Nothing is exported because it wouldn't make any sense to export.  :)
+Currently defined subclasses:
+
+  Date::Convert::Absolute
+  Date::Convert::Gregorian
+  Date::Convert::Hebrew
+  Date::Convert::Julian
+
+Nothing is exported because it wouldn't make any sense to export.
 
 
-=head1 DESCRIPTION
-
-Fucntion can be split into several categories:
+Functions can be split into several categories:
 
 =over 4
 
-=item * 
+=item *
 
 Universal functions available for all subclasses (ie. all formats).  The
 fundamental conversion routines fit this category.
@@ -149,7 +149,7 @@ Here's the breakdown by category:
 =item new
 
 Create a new object in the specified format with the specified start
-paramaters, ie. C<$date = new Date::Convert::Gregorian(1974, 11, 27)>.  The
+parameters, i.e. C<< $date = Date::Convert::Gregorian->new(1974, 11, 27) >>.  The
 start parameters vary with the subclass.  My personal preference is to
 order in decreasing order of generality (ie. year first, then month, then
 day, or year then week, etc.)
@@ -161,17 +161,22 @@ This can have a default date, which should probably be "today".
 Extract the date in a format appropriate for the subclass.  Preferably this
 should match the format used with B<new>, so
 
-	(new date::Convert::SomeClass(@a))->date;
+  Date::Convert::SomeClass->new(@a)->date;
 
-should be an identity function on @a if @a was in a legitmate format.
+should be an identity function on @a if @a is a legitimate input value.
 
 =item date_string
 
-Return the date in a pretty format.
+Return the date in a pretty, human-readable, format.
 
 =item convert
 
 Change the date to a new format.
+
+=item absol
+
+Give the absolute  value of the date, that is,  the Julian Day Number,
+at noon.
 
 =back
 
@@ -195,9 +200,12 @@ Just like year and month.
 
 Boolean.  Note that (for B<::Hebrew> and B<::Gregorian>, at least!) this
 can be also be used as a static.  That is, you can either say
-	$date->is_leap
+
+  $date->is_leap
+
 or
-	is_leap Date::Convert::Hebrew 5757
+
+  Date::Convert::Hebrew->is_leap(5757)
 
 =back
 
@@ -321,7 +329,7 @@ I<NOTE:>  I may move the default behavior into the new constructor.
 =item date
 
 Return the date in a appropriate format.  Note that the only fact that
-B<date> can take as given is that C<$$self{'absol'}> is defined, ie. this
+B<date> can take as given is that C<$$self{'absol'}> is defined, i.e. this
 object may I<not> have been initialized by the B<initialize> of this
 object's class.  For instance, you might have it check if C<$$self{'year'}>
 is defined.  If it is, then you have the year component, otherwise, you
@@ -344,42 +352,44 @@ Maybe I'll reverse that. . .
 
 =head1 EXAMPLES
 
-	#!/usr/local/bin/perl5 -w
+  #!/usr/local/bin/perl5
 
-	use Date::Convert;
+  use strict;
+  use warnings;
+  use Date::Convert;
 
-	$date=new Date::Convert::Gregorian(1974, 11, 27);
-	convert Date::Convert::Hebrew $date;
-	print $date->date_string, "\n";
+  $date = Date::Convert::Gregorian->new(1974, 11, 27);
+  Date::Convert::Hebrew->convert($date);
+  print $date->date_string, "\n";
 
 My Gregorian birthday is 27 Nov 1974.  The above prints my Hebrew birthday.
 
-	convert Date::Convert::Gregorian $date;
-	print $date->date_string, "\n";
+  Date::Convert::Gregorian->convert($date);
+  print $date->date_string, "\n";
 
 And that converts it back and prints it in Gregorian.
 
-	$guy = new Date::Convert::Hebrew (5756, 7, 8);
-	print $guy->date_string, " -> ";
-	convert Date::Convert::Gregorian $guy;
-	print $guy->date_string, "\n";
+  $guy = Date::Convert::Hebrew->new(5756, 7, 8);
+  print $guy->date_string, " -> ";
+  Date::Convert::Gregorian->convert($guy);
+  print $guy->date_string, "\n";
 
 Another day, done in reverse.
 
-	@a=(5730, 3, 2);
-	@b=(new Date::Convert::Hebrew @a)->date;
-	print "@a\n@b\n";
+  @a = (5730, 3, 2);
+  @b = Date::Convert::Hebrew->new(@a)->date;
+  print "@a\n@b\n";
 
 The above should be an identity for any list @a that represents a
 legitimate date.
 
-	#!/usr/local/bin/perl -an
+  #!/usr/local/bin/perl -an
 
-	use Date::Convert;
+  use Date::Convert;
 
-	$date = new Date::Convert::Gregorian @F;
-	convert Date::Convert::Hebrew $date;
-	print $date->date_string, "\n";
+  $date = Date::Convert::Gregorian->new(@F);
+  Date::Convert::Hebrew->convert($date);
+  print $date->date_string, "\n";
 
 And that's a quick Greg -> Hebrew conversion program, for those times when
 people ask.
