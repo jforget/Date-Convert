@@ -9,7 +9,7 @@
 
 # Julian is kinda like Gregorian, but the leap year rule is easier.
 
-package Date::Convert::Julian;  
+package Date::Convert::Julian;
 
 use utf8;
 use strict;
@@ -17,7 +17,7 @@ use warnings;
 use Carp;
 use POSIX qw/floor/;
 
-our @ISA = qw ( Date::Convert::Gregorian Date::Convert );  
+our @ISA = qw ( Date::Convert::Gregorian Date::Convert );
 
 # we steal useful constants from Gregorian
 my $JULIAN_BEGINNING = $Date::Convert::Gregorian::GREG_BEGINNING - 2;
@@ -39,7 +39,7 @@ sub initialize {
 
   # warn "These routines don't work well for Julian before year 1"
   #     if $year<1;
-  croak "month number $month out of range" 
+  croak "month number $month out of range"
     if $month < 1 || $month >12;
   my $is_leap = Date::Convert::Julian->is_leap($year);
   my $MONTH_REF = \@MONTH_ENDS;
@@ -65,27 +65,31 @@ sub initialize {
 
 
 sub year {
-    my $self = shift;
-    return $$self{year} if exists $$self{year};
-    my ($days, $year);
-    # To avoid fenceposts, year and days are initially *before* today.
-    # the next code is stolen directly form the ::Gregorian code.  Good thing
-    # I'm the one who wrote it. . .
-    $days = $self->absol - $JULIAN_BEGINNING;
-    $year =  floor ($days / $FOUR_YEARS) * 4;
-    $days %= $FOUR_YEARS;
-    if (($days+1) % $FOUR_YEARS) { # Not on a four-year boundary.  Good!
-	$year += int ($days / $NORMAL_YEAR); # fence post from year 1
-	$days %= $NORMAL_YEAR; 
-	$days += 1; # today
-	$year += 1;
-    } else {
-	$year += int ($days / $NORMAL_YEAR + 1) - 1;
-	$days =  $LEAP_YEAR;
-    }
-    $$self{year}=$year;
-    $$self{days_into_year}=$days;
-    return $year;
+  my $self = shift;
+  return $self->{year}
+    if exists $self->{year};
+
+  my ($days, $year);
+  # To avoid fenceposts, year and days are initially *before* today.
+  # the next code is stolen directly form the ::Gregorian code.  Good thing
+  # I'm the one who wrote it. . .
+  $days = $self->absol - $JULIAN_BEGINNING;
+  $year =  floor ($days / $FOUR_YEARS) * 4;
+  $days %= $FOUR_YEARS;
+  if (($days+1) % $FOUR_YEARS) {
+    # Not on a four-year boundary.  Good!
+    $year += int ($days / $NORMAL_YEAR); # fence post from year 1
+    $days %= $NORMAL_YEAR;
+    $days += 1; # today
+    $year += 1;
+  }
+  else {
+    $year += int ($days / $NORMAL_YEAR + 1) - 1;
+    $days  = $LEAP_YEAR;
+  }
+  $self->{year}           = $year;
+  $self->{days_into_year} = $days;
+  return $year;
 }
 
 sub is_leap {
