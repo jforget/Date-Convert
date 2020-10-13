@@ -1,7 +1,7 @@
 # -*- encoding: utf-8; indent-tabs-mode: nil -*-
 #
 #     Utility module to deal with Julian dates in Date::Convert
-#     Copyright © 1997, 2000, 2020 Mordechai Abzug and Jean Forget
+#     Copyright (c) 1997, 2000, 2020 Mordechai Abzug and Jean Forget
 #
 #     See the license in the embedded documentation below.
 #
@@ -115,6 +115,39 @@ Date::Convert::Julian - Utility module to deal with Julian dates in Date::Conver
 
 See the full documentation in the main module L<Date::Convert>.
 
+=head1 METHODS
+
+=head2 C<new>
+
+Create a  new object.  You must  provide three  positional parameters:
+year, month and day.
+
+=head2 C<convert>
+
+Use an  existing C<Date::Convert::>I<xxx>  object and convert  it into
+the C<Date::Convert::Julian> class.
+
+=head2 C<year>, C<month>, C<day>, C<absol>, C<date_string>
+
+Accessors,  just  like  the  base  class  C<Date::Convert>  and  other
+classes.
+
+=head2 C<date>
+
+Accessor, gives a triplet of values, with year, month and day.
+
+=head2 C<is_leap>
+
+Accessor, gives a  boolean which indicates if the year  has 365 or 366
+days (0 for a 365-day year, 1 for a 366-day year). It can be used as a
+method:
+
+  my $flag = $juliandate->is_leap;
+
+or as a function:
+
+  my $flag = Date::Convert::Julian->is_leap($year);
+
 =head1 NOTES ON JULIAN CALENDAR
 
 The  old Roman  calendar, allegedly  named for  Julius Caesar.  Purely
@@ -122,6 +155,16 @@ solar, with a month that is  a rough approximation of the lunar month.
 Used extensively in the Western world  up to a few centuries ago, then
 the West gradually  switched over to the more  accurate Gregorian. Now
 used only by the Eastern Orthodox Church, AFAIK.
+
+=head1 SEE ALSO
+
+perl(1)
+
+L<DateTime>, with L<DateTime::Calendar::Julian>
+
+L<Date::Converter>
+
+L<Date::Julian::Simple>
 
 =head1 AUTHORS
 
@@ -131,12 +174,12 @@ Unofficial co-maintainer: Jean Forget <JFORGET at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright  © 1997,  2000, 2020  Mordechai Abzug  and Jean  Forget. All
+Copyright (c)  1997, 2000, 2020  Mordechai Abzug and Jean  Forget. All
 rights reserved.
 
 This  program  is  free  software. You  can  distribute,  modify,  and
-otherwise  mangle Date::Convert::French_Rev  under the  same terms  as
-Perl 5.16.3: GNU  Public License version 1 or later  and Perl Artistic
+otherwise mangle  Date::Convert::Julian under  the same terms  as Perl
+5.16.3:  GNU Public  License  version  1 or  later  and Perl  Artistic
 License
 
 You can  find the text  of the licenses  in the F<LICENSE> file  or at
