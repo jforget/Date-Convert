@@ -1,7 +1,7 @@
 # -*- encoding: utf-8; indent-tabs-mode: nil -*-
 #
 #     Utility module to deal with Hebrew dates in Date::Convert
-#     Copyright © 1997, 2000, 2020 Mordechai Abzug and Jean Forget
+#     Copyright (c) 1997, 2000, 2020 Mordechai Abzug and Jean Forget
 #
 #     See the license in the embedded documentation below.
 #
@@ -26,7 +26,7 @@ my @FIRST_MOLAD = (   1,  5, 204);
 # Which years in the Metonic cycle are leap years?
 #
 my @LEAP_BOOL   = qw ( 1 0 0 1 0 0 1 0 1 0 0 1 0 0 1 0 0 1 0 );
-my @LEAP_CYCLE  = qw (       3     6   8    11    14    17 
+my @LEAP_CYCLE  = qw (       3     6   8    11    14    17
                        0 );
 
 my @MONTHS = ('Nissan',  'Iyyar',    'Sivan',  'Tammuz', 'Av',     'Elul',
@@ -272,6 +272,49 @@ Date::Convert::Hebrew - Utility module to deal with Hebrew dates in Date::Conver
 
 See the full documentation in the main module L<Date::Convert>.
 
+=head1 METHODS
+
+=head2 C<new>
+
+Create a  new object.  You must  provide three  positional parameters:
+year, month and day.
+
+=head2 C<convert>
+
+Use an  existing C<Date::Convert::>I<xxx>  object and convert  it into
+the C<Date::Convert::Hebrew> class.
+
+=head2 C<year>, C<month>, C<day>, C<absol>, C<date_string>
+
+Accessors,  just  like  the  base  class  C<Date::Convert>  and  other
+classes.
+
+=head2 C<date>
+
+Accessor, gives a triplet of values, with year, month and day.
+
+=head2 C<rosh>
+
+Accessor,  gives  the  abolute  value  (JDN)  for  Rosh  HaShana,  the
+beginning of the year. It can be used as a method:
+
+  my $jdn = $hebrewdate->rosh;
+
+or as a function:
+
+  my $jdn = Date::Convert::Hebrew->rosh($year);
+
+=head2 C<is_leap>
+
+Accessor,  gives  a boolean which indicates if the year has 12 or 13 months
+(0 for a 12-month year, 1 for a 13-month year). It can be used as a method:
+
+  my $flag = $hebrewdate->is_leap;
+
+or as a function:
+
+  my $flag = Date::Convert::Hebrew->is_leap($year);
+
 =head1 NOTES ON HEBREW CALENDAR
 
 This is the traditional Jewish calendar. It's based on the solar year,
@@ -280,13 +323,15 @@ Rabbis to make life tough on people who calculate calendars. :) If you
 actually wade  through the  source, you should  note that  the seventh
 month really does come before the first month, that's not a bug.
 
-It  comes with  the following  additional methods:  B<year>, B<month>,
-B<day>,  B<is_leap>, B<rosh>,  B<part_add>, and  B<part_mult>. B<rosh>
-returns the  absolute day corresponding  to "Rosh HaShana"  (New year)
-for a given year, and can also be invoked as a static. B<part_add> and
-B<part_mult> are useful functions  for Hebrew calendrical calculations
-are  not  for much  else;  if  you're  not  familiar with  the  Hebrew
-calendar, don't worry about them.
+=head1 SEE ALSO
+
+perl(1)
+
+L<DateTime>, with L<DateTime::Calendar::Hebrew>
+
+L<Date::Converter>
+
+L<Date::Hebrew::Simple>
 
 =head1 AUTHORS
 
@@ -296,12 +341,12 @@ Unofficial co-maintainer: Jean Forget <JFORGET at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright  © 1997,  2000, 2020  Mordechai Abzug  and Jean  Forget. All
+Copyright (c)  1997, 2000, 2020  Mordechai Abzug and Jean  Forget. All
 rights reserved.
 
 This  program  is  free  software. You  can  distribute,  modify,  and
-otherwise  mangle Date::Convert::French_Rev  under the  same terms  as
-Perl 5.16.3: GNU  Public License version 1 or later  and Perl Artistic
+otherwise mangle  Date::Convert::Hebrew under  the same terms  as Perl
+5.16.3:  GNU Public  License  version  1 or  later  and Perl  Artistic
 License
 
 You can  find the text  of the licenses  in the F<LICENSE> file  or at
