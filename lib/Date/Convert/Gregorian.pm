@@ -1,7 +1,7 @@
 # -*- encoding: utf-8; indent-tabs-mode: nil -*-
 #
 #     Utility module to deal with Gregorian dates in Date::Convert
-#     Copyright © 1997, 2000, 2020 Mordechai Abzug and Jean Forget
+#     Copyright (c) 1997, 2000, 2020 Mordechai Abzug and Jean Forget
 #
 #     See the license in the embedded documentation below.
 #
@@ -52,7 +52,7 @@ sub year {
     $days %= $FOUR_YEARS;
     if (($days+1) % $FOUR_YEARS) {
       $year += int ($days / $NORMAL_YEAR); # fence post from year 1
-      $days %= $NORMAL_YEAR; 
+      $days %= $NORMAL_YEAR;
       $days += 1; # today
       $year += 1;
     }
@@ -79,7 +79,6 @@ sub is_leap {
   return 1;
 }
 
-
 sub month {
     my $self = shift;
     return $$self{month} if exists $$self{month};
@@ -93,8 +92,6 @@ sub month {
     return $month;
 }
 
-
-
 sub day {
     my $self = shift;
     return $$self{day} if exists $$self{day};
@@ -102,14 +99,10 @@ sub day {
     return $$self{day};
 }
 
-
-
 sub date {
     my $self = shift;
     return ($self->year, $self->month, $self->day);
 }
-
-
 
 sub date_string {
     my $self  = shift;
@@ -126,14 +119,24 @@ sub initialize {
   croak "Date::Convert::Gregorian::initialize needs more args"
     unless defined($month)
        and defined($day);
+
   # warn "These routines don't work well for Gregorian before year 1"
   #   if $year<1;
+  croak "month number $month out of range"
+    if $month < 1 || $month > 12;
+  my $is_leap   = Date::Convert::Gregorian->is_leap($year);
+  my $MONTH_REF = \@MONTH_ENDS;
+  $MONTH_REF = \@LEAP_ENDS if $is_leap;
+  croak "day number $day out of range for month $month"
+    if   $day < 1
+      || $day + $MONTH_REF->[$month-1] > $MONTH_REF->[$month];
+
+  $self->{year}  = $year;
+  $self->{month} = $month;
+  $self->{day}   = $day;
+
+  $year --;  # get years *before* this year.  Makes math easier.  :)
   my $absol = $GREG_BEGINNING;
-  $self->{'year'}  = $year;
-  $self->{'month'} = $month;
-  $self->{'day'}   = $day;
-  my $is_leap      = Date::Convert::Gregorian->is_leap($year);
-  $year --;  #get years *before* this year.  Makes math easier.  :)
 
   # first, convert year into days. . .
   $absol += floor($year/400) * $FOUR_CENTURIES;
@@ -145,14 +148,7 @@ sub initialize {
   $absol += $year * $NORMAL_YEAR;
 
   # now, month into days.
-  croak "month number $month out of range" 
-    if $month < 1 || $month > 12;
-  my $MONTH_REF = \@MONTH_ENDS;
-  $MONTH_REF = \@LEAP_ENDS if $is_leap;
-  croak "day number $day out of range for month $month"
-    if   $day < 1
-      || $day + $$MONTH_REF[$month-1] > $$MONTH_REF[$month];
-  $absol += $day + $$MONTH_REF[$month-1] - 1;
+  $absol += $day + $MONTH_REF->[$month-1] - 1;
   $self->{absol} = $absol;
 }
 
@@ -171,6 +167,40 @@ Date::Convert::Gregorian - Utility module to deal with Gregorian dates in Date::
 
 See the full documentation in the main module L<Date::Convert>.
 
+=head1 METHODS
+
+=head2 C<new>
+
+Create a  new object.  You must  provide three  positional parameters:
+year, month and day.
+
+=head2 C<convert>
+
+Use an  existing C<Date::Convert::>I<xxx>  object and convert  it into
+the C<Date::Convert::Gregorian> class.
+
+=head2 C<year>, C<month>, C<day>, C<absol>, C<date_string>
+
+Accessors,  just  like  the  base  class  C<Date::Convert>  and  other
+classes.
+
+=head2 C<date>
+
+Accessor, gives a triplet of values, with year, month and day.
+
+=head2 C<is_leap>
+
+Accessor, gives a  boolean which indicates if the year  has 365 or 366
+days (0 for a 365-day year, 1 for a 366-day year). It can be used as a
+method:
+
+  my $flag = $gregorian_date->is_leap;
+
+or as a function:
+
+  my $flag = Date::Convert::Gregorian->is_leap($year);
+
+
 =head1 NOTES ON GREGORIAN CALENDAR
 
 The Gregorian calendar  is a purely solar calendar, with  a month that
@@ -178,12 +208,19 @@ is only  an approximation  of a lunar  month. It is  based on  the old
 Julian (Roman)  calendar. This is the  calendar that has been  used by
 most of the Western world for the  last few centuries. The time of its
 adoption varies  from country  to country. This  B<::Gregorian> module
-allows  you to  extrapolate back  to 1  A.D., as  per the  programming
-tradition, even though the calendar definitely was not in use then.
+implements the  I<proleptic> Gregorian  calendar, that is,  a calendar
+extrapolated back  to 1 A.D.,  as per the programming  tradition, even
+though the real Gregorian calendar definitely was not in use then.
 
-In addition  to the required  methods, B<Gregorian> also  has B<year>,
-B<month>, B<day>, and B<is_leap> methods.  B<is_leap> can also be used
-statically.
+=head1 SEE ALSO
+
+perl(1)
+
+L<DateTime>
+
+L<Date::Converter>
+
+L<Date::Gregorian::Simple>
 
 =head1 AUTHORS
 
@@ -193,11 +230,11 @@ Unofficial co-maintainer: Jean Forget <JFORGET at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright  © 1997,  2000, 2020  Mordechai Abzug  and Jean  Forget. All
+Copyright (c)  1997, 2000, 2020  Mordechai Abzug and Jean  Forget. All
 rights reserved.
 
 This  program  is  free  software. You  can  distribute,  modify,  and
-otherwise  mangle Date::Convert::French_Rev  under the  same terms  as
+otherwise  mangle Date::Convert::Gregorian  under the  same terms  as
 Perl 5.16.3: GNU  Public License version 1 or later  and Perl Artistic
 License
 
