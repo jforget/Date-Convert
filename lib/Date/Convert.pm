@@ -95,13 +95,14 @@ Date::Convert - Convert Between Calendrical Formats
 =head1 DESCRIPTION
 
 Date::Convert is intended to allow you to convert back and forth between
-any arbitrary date formats (ie. pick any from: Gregorian, Julian, Hebrew,
+any arbitrary date formats (i.e. pick any from: Gregorian, Julian, Hebrew,
 Absolute, and any others that get added on).  It does this by having a
 separate subclass for each format, and requiring each class to provide
 standardized methods for converting to and from the date format of the base
 class.  In this way, instead of having to code a conversion routine for
-going between and two arbitrary formats foo and bar, the function only
-needs to convert foo to the base class and the base class to bar.  Ie:
+going between and two arbitrary formats I<foo> and I<bar>, the function only
+needs to convert I<foo> to the base class and the base class to I<bar>.
+For example:
 
   Gregorian <--> Base class <--> Hebrew
 
@@ -394,21 +395,27 @@ legitimate date.
 And that's a quick Greg -> Hebrew conversion program, for those times when
 people ask.
 
-=head1 SEE ALSO
+=head1 PROBLEMS AND KNOWN ISSUES
 
-perl(1), Date::DateCalc(3)
+The module ignores  the differences between the  definitions of dates.
+More  specifically,  Gregorian  and   Julian  dates  are  midnight  to
+midnight, Hebrew dates are sunset to sunset and Julian Day Numbers are
+noon  to noon.  Thre  is  no provision  to  distinguish between  these
+definitions.
+
+Years are  numbered with the astronomers'  and mathematicians' scheme,
+that  is,  there  is a  year  zero  preceding  year  one. To  get  the
+historians' scheme, you  will have to shift by one  year. For example,
+what the  modules call "Year  -45" corresponds to what  the historians
+call "46 BC".
 
 =head1 VERSION
 
 Date::Convert 0.17 (pre-alpha)
 
-=head1 AUTHORS
-
-Module creator: Mordechai T. Abzug <morty at umbc dot edu>
-
-Unofficial co-maintainer: Jean Forget <JFORGET at cpan dot org>
-
 =head1 ACKNOWLEDGEMENTS AND FURTHER READING
+
+=head2 By MORTY in 1997
 
 The basic idea of using astronomical dates as an intermediary between all
 calculations comes from Dershowitz and Reingold.  Reingold's code is the
@@ -436,12 +443,42 @@ both more complete and easier to comprehend.  It's included in "Mich't'vei
 HaRambam" (or some such; I've I<got> to visit that house), which was
 reprinted just a few years ago.
 
-Steffen Beyer's Date::DateCalc showed me how to use MakeMaker and write POD
+Steffen Beyer's L<Date::Calc> showed me how to use MakeMaker and write POD
 documentation.  Of course, any error is my fault, not his!
+
+=head2 By JFORGET in 2020
+
+Twenty-three years  later, I<Calendrical  Calculations> is  already at
+its 4th edition. I have the 3rd edition, published in 2008.
+
+Several alternative calendar Perl modules  have been published, but it
+does  not mean  that L<Date::Convert>  is now  irrelevant. After  all,
+I<There Is More Than One Way To Do It>.
+
+=head1 SEE ALSO
+
+perl(1)
+
+L<Date::Convert::French_Rev> an example of a new subclass added to the
+basic ones.
+
+L<Date::Calc>
+
+L<DateTime>, with L<DateTime::Calendar::Julian> and L<DateTime::Calendar::Hebrew>
+
+L<Date::Converter>
+
+L<Date::Gregorian::Simple>, L<Date::Hebrew::Simple> and L<Date::Julian::Simple>
+
+=head1 AUTHORS
+
+Module creator: Mordechai T. Abzug <morty at umbc dot edu>
+
+Unofficial co-maintainer: Jean Forget <JFORGET at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright  © 1997,  2000, 2020  Mordechai Abzug  and Jean  Forget. All
+Copyright (c) 1997,  2000, 2020  Mordechai Abzug  and Jean  Forget. All
 rights reserved.
 
 This  program  is  free  software. You  can  distribute,  modify,  and
