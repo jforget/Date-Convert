@@ -33,14 +33,16 @@ use warnings;
 use Test::More;
 use Date::Convert;
 
-plan(tests => 4);
+plan(tests => 6);
 
 my $date = Date::Convert::Gregorian->new(1974, 11, 27);
 
 Date::Convert::Hebrew->convert($date);
+is($date->day, 13);
 is($date->date_string, "5735 Kislev 13");
 
 Date::Convert::Gregorian->convert($date);
+is($date->day, 27);
 is($date->date_string, "1974 Nov 27");
 
 my $guy = Date::Convert::Hebrew->new(5756, 7, 8);
