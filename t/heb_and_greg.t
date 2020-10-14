@@ -1,4 +1,4 @@
-#!perl -w
+#!perl
 # -*- encoding: utf-8; indent-tabs-mode: nil -*-
 #
 #     Test script for Date::Convert
@@ -28,24 +28,26 @@
 #     Inc., <https://www.fsf.org/>.
 #
 
+use strict;
+use warnings;
 use Test::More;
 use Date::Convert;
 
 plan(tests => 4);
 
-$date=new Date::Convert::Gregorian(1974, 11, 27);
+my $date = Date::Convert::Gregorian->new(1974, 11, 27);
 
-convert Date::Convert::Hebrew $date;
+Date::Convert::Hebrew->convert($date);
 is($date->date_string, "5735 Kislev 13");
 
-convert Date::Convert::Gregorian $date;
+Date::Convert::Gregorian->convert($date);
 is($date->date_string, "1974 Nov 27");
 
-$guy = new Date::Convert::Hebrew (5756, 7, 8);
+my $guy = Date::Convert::Hebrew->new(5756, 7, 8);
 
-convert Date::Convert::Gregorian $guy;
+Date::Convert::Gregorian->convert($guy);
 is($guy->date_string, "1995 Oct 2");
 
-convert Date::Convert::Hebrew $guy;
+Date::Convert::Hebrew->convert($guy);
 is($guy->date_string, "5756 Tishrei 8");
 
