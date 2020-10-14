@@ -2,7 +2,7 @@
 # -*- encoding: utf-8; indent-tabs-mode: nil -*-
 #
 #     Test script for Date::Convert
-#     Copyright © 1997, 2000, 2020 Mordechai Abzug and Jean Forget
+#     Copyright (c) 1997, 2000, 2020 Mordechai Abzug and Jean Forget
 #
 #     This program is distributed under the same terms as Perl 5.16.3:
 #     GNU Public License version 1 or later and Perl Artistic License
@@ -28,39 +28,24 @@
 #     Inc., <https://www.fsf.org/>.
 #
 
+use Test::More;
 use Date::Convert;
 
-print "1..4\n";
-
-$n=1;
+plan(tests => 4);
 
 $date=new Date::Convert::Gregorian(1974, 11, 27);
 
 convert Date::Convert::Hebrew $date;
-if ($date->date_string eq "5735 Kislev 13") 
-    {print "ok $n\n"} else 
-    {print "not ok $n\n"}
-$n++;
+is($date->date_string, "5735 Kislev 13");
 
 convert Date::Convert::Gregorian $date;
-if ($date->date_string eq "1974 Nov 27")
-    {print "ok $n\n"} else 
-    {print "not ok $n\n"}
-$n++;
-
-
+is($date->date_string, "1974 Nov 27");
 
 $guy = new Date::Convert::Hebrew (5756, 7, 8);
 
 convert Date::Convert::Gregorian $guy;
-if ($guy->date_string eq "1995 Oct 2")
-    {print "ok $n\n"} else 
-    {print "not ok $n\n"}
-$n++;
+is($guy->date_string, "1995 Oct 2");
 
 convert Date::Convert::Hebrew $guy;
-if ($guy->date_string eq "5756 Tishrei 8")
-    {print "ok $n\n"} else 
-    {print "not ok $n\n"}
-$n++;
+is($guy->date_string, "5756 Tishrei 8");
 
