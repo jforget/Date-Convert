@@ -1,8 +1,8 @@
-#!perl -w
+#!perl
 # -*- encoding: utf-8; indent-tabs-mode: nil -*-
 #
 #     Test script for Date::Convert
-#     Copyright © 1997, 2000, 2020 Mordechai Abzug and Jean Forget
+#     Copyright (c) 1997, 2000, 2020 Mordechai Abzug and Jean Forget
 #
 #     This program is distributed under the same terms as Perl 5.16.3:
 #     GNU Public License version 1 or later and Perl Artistic License
@@ -28,16 +28,16 @@
 #     Inc., <https://www.fsf.org/>.
 #
 
+use warnings;
+use Test::More;
 use Date::Convert;
 
-print "1..137\n";
+plan(tests => 137);
 
 $n=1;
 
 $date=new Date::Convert::Hebrew(5757, 13, 9);
-if ($$date{absol} == 2450526)
-    {print "ok $n\n"} else 
-    {print "not ok $n\n"}
+is($$date{absol}, 2450526);
 $n++;
 
 @absols=qw(2447800 2448155 2448509 2448894 2449247 2449602 2449986
@@ -50,41 +50,29 @@ $n++;
 
 foreach $i (5750..5780) {
     my $rosh=rosh Date::Convert::Hebrew $i;
-    if ($rosh = shift @absols)
-    {print "ok $n\n"} else 
-    {print "not ok $n\n"}
+    is($rosh, shift @absols);
 $n++;
 }
 
 
 $rina_birthday=new Date::Convert::Gregorian(1976, 5, 25);
-if ($rina_birthday->date_string eq "1976 May 25")
-    {print "ok $n\n"} else 
-    {print "not ok $n\n"}
+is($rina_birthday->date_string, "1976 May 25");
 $n++;
 
 convert Date::Convert::Hebrew $rina_birthday;
-if ($rina_birthday->date_string eq "5736 Iyyar 25")
-    {print "ok $n\n"} else 
-    {print "not ok $n\n"}
+is($rina_birthday->date_string, "5736 Iyyar 25");
 $n++;
 
 convert Date::Convert::Gregorian $rina_birthday;
-if ($rina_birthday->date_string eq "1976 May 25")
-    {print "ok $n\n"} else 
-    {print "not ok $n\n"}
+is($rina_birthday->date_string, "1976 May 25");
 $n++;
 
 my $broken_date=new Date::Convert::Hebrew(5765, 10, 26);
-if ($broken_date->date_string eq "5765 Teves 26")
-    {print "ok $n\n"} else 
-    {print "not ok $n\n"}
+is($broken_date->date_string, "5765 Teves 26");
 $n++;
 
 convert Date::Convert::Gregorian $broken_date;
-if ($broken_date->date_string eq "2005 Jan 7")
-    {print "ok $n\n"} else 
-    {print "not ok $n\n"}
+is($broken_date->date_string, "2005 Jan 7");
 $n++;
 
 
@@ -96,9 +84,7 @@ $n++;
 	  0 0 1 0 0);
 
 foreach $i (1..100) {
-    if (is_leap Date::Convert::Hebrew($i) == shift @leaps)
-    {print "ok $n\n"} else 
-    {print "not ok $n\n"}
+    is(is_leap Date::Convert::Hebrew($i), shift @leaps);
 $n++;
 }
 
