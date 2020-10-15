@@ -33,40 +33,12 @@ use warnings;
 use Test::More;
 use Date::Convert;
 
-plan(tests => 137);
-
-my $date = Date::Convert::Hebrew->new(5757, 13, 9);
-is($$date{absol}, 2450526);
-
 my @absols = qw(2447800 2448155 2448509 2448894 2449247 2449602 2449986
                 2450341 2450724 2451078 2451433 2451818 2452171 2452525
                 2452910 2453265 2453648 2454002 2454357 2454740 2455094
                 2455449 2455834 2456188 2456541 2456926 2457280 2457665
                 2458018 2458372 2458757
              );
-
-
-foreach my $i (5750..5780) {
-    my $rosh = Date::Convert::Hebrew->rosh($i);
-    is($rosh, shift @absols);
-}
-
-
-my $rina_birthday = Date::Convert::Gregorian->new(1976, 5, 25);
-is($rina_birthday->date_string, "1976 May 25");
-
-Date::Convert::Hebrew->convert($rina_birthday);
-is($rina_birthday->date_string, "5736 Iyyar 25");
-
-Date::Convert::Gregorian->convert($rina_birthday);
-is($rina_birthday->date_string, "1976 May 25");
-
-my $broken_date = Date::Convert::Hebrew->new(5765, 10, 26);
-is($broken_date->date_string, "5765 Teves 26");
-
-convert Date::Convert::Gregorian $broken_date;
-is($broken_date->date_string, "2005 Jan 7");
-
 
 my @leaps = qw(0 0 1 0 0 1 0 1 0 0 1 0 0 1 0 0 1 0 1
                0 0 1 0 0 1 0 1 0 0 1 0 0 1 0 0 1 0 1
@@ -75,7 +47,38 @@ my @leaps = qw(0 0 1 0 0 1 0 1 0 0 1 0 0 1 0 0 1 0 1
                0 0 1 0 0 1 0 1 0 0 1 0 0 1 0 0 1 0 1
                0 0 1 0 0);
 
+plan(tests => @absols + @leaps + 6);
+
+# test 1
+my $date = Date::Convert::Hebrew->new(5757, 13, 9);
+is($$date{absol}, 2450526);
+
+foreach my $year (5750..5780) {
+  my $rosh = Date::Convert::Hebrew->rosh($year);
+  is($rosh, shift @absols);
+}
+
+# test 2
+my $rina_birthday = Date::Convert::Gregorian->new(1976, 5, 25);
+is($rina_birthday->date_string, "1976 May 25");
+
+# test 3
+Date::Convert::Hebrew->convert($rina_birthday);
+is($rina_birthday->date_string, "5736 Iyyar 25");
+
+# test 4
+Date::Convert::Gregorian->convert($rina_birthday);
+is($rina_birthday->date_string, "1976 May 25");
+
+# test 5
+my $broken_date = Date::Convert::Hebrew->new(5765, 10, 26);
+is($broken_date->date_string, "5765 Teves 26");
+
+# test 6
+convert Date::Convert::Gregorian $broken_date;
+is($broken_date->date_string, "2005 Jan 7");
+
 foreach my $i (1..100) {
-    is(is_leap Date::Convert::Hebrew($i), shift @leaps);
+  is(is_leap Date::Convert::Hebrew($i), shift @leaps);
 }
 
