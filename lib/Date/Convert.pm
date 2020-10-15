@@ -31,11 +31,13 @@ my $VERSION_TODAY = 2450522; # today in JDN, when I wrote this.
 
 
 sub new { # straight out of the perlobj manpage:
-    my $class = shift;
-    my $self = {};
-    bless $self, $class;
-    $self->initialize(@_);
-    return $self;
+  my $class = shift;
+  croak "$class is an abstract class and cannot be instantiated"
+    if $class eq "Date::Convert";
+  my $self = {};
+  bless $self, $class;
+  $self->initialize(@_);
+  return $self;
 }
 
 
@@ -49,13 +51,12 @@ sub initialize {
 }
 
 
-
 sub _clean {
-    my $self  = shift;
-    my $key;
-    foreach $key (keys %$self) {
-	delete $$self{$key} unless $key eq 'absol';
-    }
+  my $self  = shift;
+  my $key;
+  foreach $key (keys %$self) {
+    delete $self->{$key} unless $key eq 'absol';
+  }
 }
 
 
@@ -400,7 +401,7 @@ people ask.
 The module ignores  the differences between the  definitions of dates.
 More  specifically,  Gregorian  and   Julian  dates  are  midnight  to
 midnight, Hebrew dates are sunset to sunset and Julian Day Numbers are
-noon  to noon.  Thre  is  no provision  to  distinguish between  these
+noon  to noon.  There is  no  provision to  distinguish between  these
 definitions.
 
 Years are  numbered with the astronomers'  and mathematicians' scheme,
@@ -482,9 +483,8 @@ Copyright (c) 1997,  2000, 2020  Mordechai Abzug  and Jean  Forget. All
 rights reserved.
 
 This  program  is  free  software. You  can  distribute,  modify,  and
-otherwise  mangle Date::Convert::French_Rev  under the  same terms  as
-Perl 5.16.3: GNU  Public License version 1 or later  and Perl Artistic
-License
+otherwise mangle  Date::Convert under the  same terms as  Perl 5.16.3:
+GNU Public License version 1 or later and Perl Artistic License
 
 You can  find the text  of the licenses  in the F<LICENSE> file  or at
 L<https://dev.perl.org/licenses/artistic.html>
