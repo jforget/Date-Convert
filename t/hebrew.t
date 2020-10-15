@@ -28,64 +28,54 @@
 #     Inc., <https://www.fsf.org/>.
 #
 
+use strict;
 use warnings;
 use Test::More;
 use Date::Convert;
 
 plan(tests => 137);
 
-$n=1;
-
-$date=new Date::Convert::Hebrew(5757, 13, 9);
+my $date = Date::Convert::Hebrew->new(5757, 13, 9);
 is($$date{absol}, 2450526);
-$n++;
 
-@absols=qw(2447800 2448155 2448509 2448894 2449247 2449602 2449986
-	   2450341 2450724 2451078 2451433 2451818 2452171 2452525
-	   2452910 2453265 2453648 2454002 2454357 2454740 2455094
-	   2455449 2455834 2456188 2456541 2456926 2457280 2457665
-	   2458018 2458372 2458757
-	);
+my @absols = qw(2447800 2448155 2448509 2448894 2449247 2449602 2449986
+                2450341 2450724 2451078 2451433 2451818 2452171 2452525
+                2452910 2453265 2453648 2454002 2454357 2454740 2455094
+                2455449 2455834 2456188 2456541 2456926 2457280 2457665
+                2458018 2458372 2458757
+             );
 
 
-foreach $i (5750..5780) {
-    my $rosh=rosh Date::Convert::Hebrew $i;
+foreach my $i (5750..5780) {
+    my $rosh = Date::Convert::Hebrew->rosh($i);
     is($rosh, shift @absols);
-$n++;
 }
 
 
-$rina_birthday=new Date::Convert::Gregorian(1976, 5, 25);
+my $rina_birthday = Date::Convert::Gregorian->new(1976, 5, 25);
 is($rina_birthday->date_string, "1976 May 25");
-$n++;
 
-convert Date::Convert::Hebrew $rina_birthday;
+Date::Convert::Hebrew->convert($rina_birthday);
 is($rina_birthday->date_string, "5736 Iyyar 25");
-$n++;
 
-convert Date::Convert::Gregorian $rina_birthday;
+Date::Convert::Gregorian->convert($rina_birthday);
 is($rina_birthday->date_string, "1976 May 25");
-$n++;
 
-my $broken_date=new Date::Convert::Hebrew(5765, 10, 26);
+my $broken_date = Date::Convert::Hebrew->new(5765, 10, 26);
 is($broken_date->date_string, "5765 Teves 26");
-$n++;
 
 convert Date::Convert::Gregorian $broken_date;
 is($broken_date->date_string, "2005 Jan 7");
-$n++;
 
 
-@leaps=qw(0 0 1 0 0 1 0 1 0 0 1 0 0 1 0 0 1 0 1 
-	  0 0 1 0 0 1 0 1 0 0 1 0 0 1 0 0 1 0 1 
-	  0 0 1 0 0 1 0 1 0 0 1 0 0 1 0 0 1 0 1 
-	  0 0 1 0 0 1 0 1 0 0 1 0 0 1 0 0 1 0 1 
-	  0 0 1 0 0 1 0 1 0 0 1 0 0 1 0 0 1 0 1 
-	  0 0 1 0 0);
+my @leaps = qw(0 0 1 0 0 1 0 1 0 0 1 0 0 1 0 0 1 0 1
+               0 0 1 0 0 1 0 1 0 0 1 0 0 1 0 0 1 0 1
+               0 0 1 0 0 1 0 1 0 0 1 0 0 1 0 0 1 0 1
+               0 0 1 0 0 1 0 1 0 0 1 0 0 1 0 0 1 0 1
+               0 0 1 0 0 1 0 1 0 0 1 0 0 1 0 0 1 0 1
+               0 0 1 0 0);
 
-foreach $i (1..100) {
+foreach my $i (1..100) {
     is(is_leap Date::Convert::Hebrew($i), shift @leaps);
-$n++;
 }
 
-print "\n";
