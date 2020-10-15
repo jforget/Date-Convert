@@ -1,14 +1,23 @@
 -*- encoding: utf-8; indent-tabs-mode: nil -*-
 
 0.17:   released on xxx
-	- xxx
+        - cleaner distribution architecture, with a "/lib" subdirectory, MANIFEST, META.json, etc
+        - more modern syntax, for example replacing indirect object method calls by arrow method calls
+        - use strict and use warnings in all modules
+        - fix off-by-400-years or off-by-4-years errors when converting a Hebrew date to a BC Gregorian / Julian date (RT 130291)
+        - fix "impossible year-length" errors and off-by-one-day errors in Hebrew dates (RT 98287 and RT 130291)
+        - month 12 in leap years is "Adar I" instead of just "Adar" (RT 98287)
+        - fix some errors related to Julian 2100-02-29 leap day (RT 98287)
+        - fix errors when a date object is built with empty input parameters
+        - fix the POD documentation
+        - make Date::Convert an abstract class, no instantiation
 
 0.16:
-	- BUG: Hebrew broken, off-by-one error in rosh calulations
+        - BUG: Hebrew broken, off-by-one error in rosh calulations
 
 0.15:
-	- BUG: no initialize for Julian!  How embarassing.
-	- reworded docs to replace "Absolute" for "Astro"
+        - BUG: no initialize for Julian!  How embarassing.
+        - reworded docs to replace "Absolute" for "Astro"
 
 0.14:
-	- first public release
+        - first public release
